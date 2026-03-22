@@ -1,0 +1,141 @@
+@import 'tailwindcss';
+
+:root {
+  --app-height: 100vh;
+  --safe-area-inset-top: env(safe-area-inset-top, 0px);
+  --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-area-inset-left: env(safe-area-inset-left, 0px);
+  --safe-area-inset-right: env(safe-area-inset-right, 0px);
+  --keyboard-inset-bottom: 0px;
+}
+
+@supports (height: 100dvh) {
+  :root {
+    --app-height: 100dvh;
+  }
+}
+
+html,
+body,
+#app {
+  height: var(--app-height);
+  overflow: hidden;
+  overscroll-behavior: none;
+  -webkit-overflow-scrolling: touch;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  background: hsl(var(--bg-100));
+  margin: 0;
+  font-family: var(--font-ui-sans);
+}
+
+@theme {
+  --color-bg-000: hsl(var(--bg-000));
+  --color-bg-100: hsl(var(--bg-100));
+  --color-bg-200: hsl(var(--bg-200));
+  --color-bg-300: hsl(var(--bg-300));
+  --color-bg-400: hsl(var(--bg-400));
+
+  --color-text-000: hsl(var(--text-000));
+  --color-text-100: hsl(var(--text-100));
+  --color-text-200: hsl(var(--text-200));
+  --color-text-300: hsl(var(--text-300));
+  --color-text-400: hsl(var(--text-400));
+  --color-text-500: hsl(var(--text-500));
+  --color-text-600: hsl(var(--text-600));
+
+  --color-accent-brand: hsl(var(--accent-brand));
+  --color-accent-main-000: hsl(var(--accent-main-000));
+  --color-accent-main-100: hsl(var(--accent-main-100));
+  --color-accent-main-200: hsl(var(--accent-main-200));
+  --color-accent-secondary-100: hsl(var(--accent-secondary-100));
+
+  --color-success-100: hsl(var(--success-100));
+  --color-success-200: hsl(var(--success-200));
+  --color-success-bg: hsl(var(--success-bg));
+
+  --color-warning-100: hsl(var(--warning-100));
+  --color-warning-200: hsl(var(--warning-200));
+  --color-warning-bg: hsl(var(--warning-bg));
+
+  --color-danger-000: hsl(var(--danger-000));
+  --color-danger-100: hsl(var(--danger-100));
+  --color-danger-200: hsl(var(--danger-200));
+  --color-danger-bg: hsl(var(--danger-bg));
+  --color-danger-900: hsl(var(--danger-900));
+
+  --color-info-100: hsl(var(--info-100));
+  --color-info-200: hsl(var(--info-200));
+  --color-info-bg: hsl(var(--info-bg));
+
+  --color-border-100: hsl(var(--border-100));
+  --color-border-200: hsl(var(--border-200));
+  --color-border-300: hsl(var(--border-300));
+
+  --color-oncolor-100: hsl(var(--oncolor-100));
+
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-2xl: 20px;
+  --radius-full: 9999px;
+
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+  --shadow-float: 0 4px 20px 0 rgb(0 0 0 / 0.15);
+
+  --font-ui-sans: system-ui, -apple-system, 'Segoe UI', Roboto, 'Noto Sans', 'Liberation Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji';
+  --font-sans: var(--font-ui-sans);
+  --font-ui-serif: 'Georgia', 'Noto Serif', serif;
+  --font-mono: ui-monospace, 'SFMono-Regular', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
+}
+
+:root {
+  /* Default Eucalyptus Light Theme */
+  --bg-000: 150 10% 99%;
+  --bg-100: 150 12% 96%;
+  --bg-200: 150 12% 93%;
+  --bg-300: 150 10% 89%;
+  --bg-400: 150 10% 85%;
+
+  --text-000: 0 0% 100%;
+  --text-100: 170 15% 15%;
+  --text-200: 170 10% 40%;
+  --text-300: 170 8% 55%;
+  --text-400: 170 8% 70%;
+  --text-500: 170 6% 78%;
+  --text-600: 170 10% 85%;
+
+  --accent-brand: 165 45% 42%;
+  --accent-main-000: 165 40% 35%;
+  --accent-main-100: 165 45% 42%;
+  --accent-main-200: 165 50% 48%;
+  --accent-secondary-100: 200 45% 50%;
+
+  --success-100: 140 40% 40%;
+  --success-200: 140 35% 32%;
+  --success-bg: 140 30% 94%;
+  --warning-100: 35 80% 45%;
+  --warning-200: 35 70% 38%;
+  --warning-bg: 35 60% 94%;
+  --danger-000: 5 55% 40%;
+  --danger-100: 5 60% 55%;
+  --danger-200: 5 65% 62%;
+  --danger-bg: 5 60% 96%;
+  --danger-900: 5 50% 93%;
+  --info-100: 200 50% 50%;
+  --info-200: 200 45% 60%;
+  --info-bg: 200 40% 95%;
+
+  --border-100: 160 10% 86%;
+  --border-200: 160 10% 82%;
+  --border-300: 160 10% 75%;
+
+  --always-black: 0 0% 0%;
+  --always-white: 0 0% 100%;
+  --oncolor-100: 0 0% 100%;
+}
