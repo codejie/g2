@@ -15,11 +15,27 @@
     <div class="p-2 space-y-1">
       <button
         @click="handleCreateProject"
-        class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl bg-accent-brand text-white text-sm font-medium hover:bg-accent-main-000 transition-colors group shadow-sm"
+        :disabled="chatStore.loading"
+        class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl bg-accent-brand text-white text-sm font-medium hover:bg-accent-main-000 transition-colors group shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        <Plus :size="18" class="group-hover:rotate-90 transition-transform duration-300" />
-        <span>创建项目</span>
+        <Plus v-if="!chatStore.loading" :size="18" class="group-hover:rotate-90 transition-transform duration-300" />
+        <Loader2 v-else :size="18" class="animate-spin" />
+        <span>{{ chatStore.loading ? '正在创建...' : '创建项目' }}</span>
       </button>
+    </div>
+
+    <!-- Current Session Info -->
+    <div v-if="chatStore.currentSession" class="px-2 py-1">
+      <div class="px-4 py-2 text-[10px] font-bold text-text-400 uppercase tracking-wider">
+        当前会话
+      </div>
+      <div class="px-3 py-2 rounded-xl bg-accent-brand/5 border border-accent-brand/10 flex items-center gap-3">
+        <div class="w-2 h-2 rounded-full bg-success-100 animate-pulse"></div>
+        <div class="flex flex-col min-w-0">
+          <span class="text-xs font-bold text-text-100 truncate">{{ chatStore.currentSession.id }}</span>
+          <span class="text-[10px] text-text-400 truncate">{{ chatStore.currentSession.title || 'Active Session' }}</span>
+        </div>
+      </div>
     </div>
 
     <div class="px-4 py-2 text-[10px] font-bold text-text-400 uppercase tracking-wider">
@@ -78,7 +94,8 @@ import {
   Settings,
   ChevronLeft,
   ChevronRight,
-  Plus
+  Plus,
+  Loader2
 } from 'lucide-vue-next'
 import { useChatStore } from '../store/chatStore'
 
@@ -89,8 +106,12 @@ const toggle = () => {
   isCollapsed.value = !isCollapsed.value
 }
 
-const handleCreateProject = () => {
-  chatStore.startNewSession()
+const handleCreateProject = async () => {
+  try {
+    await chatStore.startNewSession()
+  } catch (err) {
+    // 错误处理已在 store 中记录
+  }
 }
 
 defineEmits<{

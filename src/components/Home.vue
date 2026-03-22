@@ -52,9 +52,11 @@
                     </div>
                     <button
                       @click="handleSendMessage"
-                      class="p-2 bg-accent-brand hover:bg-accent-main-000 text-white rounded-xl shadow-sm transition-all active:scale-95"
+                      :disabled="chatStore.sending"
+                      class="p-2 bg-accent-brand hover:bg-accent-main-000 text-white rounded-xl shadow-sm transition-all active:scale-95 disabled:opacity-50"
                     >
-                      <ArrowUp :size="20" />
+                      <ArrowUp v-if="!chatStore.sending" :size="20" />
+                      <Loader2 v-else :size="20" class="animate-spin" />
                     </button>
                   </div>
                 </div>
@@ -63,13 +65,27 @@
           </div>
 
           <!-- Case 2: Chat state (With messages) -->
-          <div v-else class="max-w-3xl mx-auto w-full pt-8">
-            <div class="flex gap-4 mb-8">
-              <div class="w-8 h-8 rounded-full bg-accent-brand shrink-0 flex items-center justify-center text-white">
-                <Sparkles :size="18" />
+          <div v-else class="max-w-3xl mx-auto w-full pt-8 space-y-8 pb-32">
+            <div
+              v-for="msg in messageStore.messages"
+              :key="msg.id"
+              class="flex gap-4 animate-in fade-in slide-in-from-bottom-2 duration-300"
+            >
+              <div class="w-8 h-8 rounded-full shrink-0 flex items-center justify-center text-white"
+                   :class="msg.role === 'user' ? 'bg-bg-300 text-text-200' : 'bg-accent-brand'">
+                <User v-if="msg.role === 'user'" :size="16" />
+                <Sparkles v-else :size="18" />
               </div>
-              <div class="space-y-2 flex-1">
-                <p class="text-text-100 leading-relaxed">Hello! I'm G2, connected via {{ modelStore.selectedModel?.name }}. How can I help you today?</p>
+
+              <div class="space-y-2 flex-1 overflow-hidden min-w-0">
+                <div v-for="(part, idx) in msg.parts" :key="idx" class="text-text-100 leading-relaxed break-words whitespace-pre-wrap">
+                  <template v-if="part.type === 'text'">
+                    {{ (part as any).text }}
+                  </template>
+                  <div v-else-if="part.type === 'agent'" class="p-2 bg-bg-200 rounded-md text-xs font-mono">
+                    Executing: {{ (part as any).name }}
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -104,9 +120,11 @@
                   </div>
                   <button
                     @click="handleSendMessage"
-                    class="p-2 bg-accent-brand hover:bg-accent-main-000 text-white rounded-xl shadow-sm transition-all active:scale-95"
+                    :disabled="chatStore.sending"
+                    class="p-2 bg-accent-brand hover:bg-accent-main-000 text-white rounded-xl shadow-sm transition-all active:scale-95 disabled:opacity-50"
                   >
-                    <ArrowUp :size="20" />
+                    <ArrowUp v-if="!chatStore.sending" :size="20" />
+                    <Loader2 v-else :size="20" class="animate-spin" />
                   </button>
                 </div>
               </div>
@@ -129,28 +147,55 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, watch, nextTick } from 'vue'
 import {
   Sparkles,
   Paperclip,
   Globe,
   ArrowUp,
-  Zap
+  Zap,
+  Loader2,
+  User
 } from 'lucide-vue-next'
 import { useModelStore } from '../store/modelStore'
 import { useChatStore } from '../store/chatStore'
+import { useMessageStore } from '../store/messageStore'
 
 const modelStore = useModelStore()
 const chatStore = useChatStore()
+const messageStore = useMessageStore()
+
 const inputMessage = ref('')
 const scrollContainer = ref<HTMLElement | null>(null)
 
-const handleSendMessage = () => {
-  if (!inputMessage.value.trim()) return
+// 自动滚动到底部
+const scrollToBottom = async () => {
+  await nextTick()
+  if (scrollContainer.value) {
+    scrollContainer.value.scrollTop = scrollContainer.value.scrollHeight
+  }
+}
 
-  // Transition to chat state via store
-  chatStore.startNewSession()
-  inputMessage.value = ''
+// 监听消息列表变化，自动滚动
+watch(() => messageStore.messages, () => {
+  scrollToBottom()
+}, { deep: true })
+
+const handleSendMessage = async () => {
+  const text = inputMessage.value.trim()
+  if (!text || chatStore.sending) return
+
+  try {
+    // 1. 在 UI 上先添加用户消息
+    messageStore.addUserMessage(text)
+    inputMessage.value = ''
+
+    // 2. 异步发送到后端
+    await chatStore.sendPrompt(text)
+  } catch (err) {
+    console.error('Failed to send message:', err)
+    inputMessage.value = text
+  }
 }
 </script>
 

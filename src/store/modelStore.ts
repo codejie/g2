@@ -1,12 +1,15 @@
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { getActiveModels } from '../api/client'
 import type { ModelInfo } from '../types/ui'
 
 export const useModelStore = defineStore('model', () => {
   const models = ref<ModelInfo[]>([])
-  const selectedModel = ref<ModelInfo | null>(null)
   const loading = ref(false)
+
+  // 尝试从持久化存储中获取
+  const savedModelId = localStorage.getItem('g2_selected_model_id')
+  const selectedModel = ref<ModelInfo | null>(null)
 
   const fetchModels = async (directory?: string) => {
     loading.value = true
@@ -14,7 +17,16 @@ export const useModelStore = defineStore('model', () => {
       const activeModels = await getActiveModels(directory)
       models.value = activeModels
 
-      // 默认选择第一个模型（如果没有已选择的）
+      // 优先级逻辑：
+      // 1. 如果已持久化了 ID，且列表中存在该模型，则选中它
+      // 2. 否则，如果当前没有选中的，则选第一个
+      if (savedModelId && activeModels.length > 0) {
+        const found = activeModels.find(m => m.id === savedModelId)
+        if (found) {
+          selectedModel.value = found
+        }
+      }
+
       if (!selectedModel.value && activeModels.length > 0) {
         selectedModel.value = activeModels[0]
       }
@@ -27,6 +39,8 @@ export const useModelStore = defineStore('model', () => {
 
   const selectModel = (model: ModelInfo) => {
     selectedModel.value = model
+    // 记录到本地存储
+    localStorage.setItem('g2_selected_model_id', model.id)
   }
 
   return {

@@ -19,18 +19,31 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { useModelStore } from './store/modelStore'
+import { useEventStore } from './store/eventStore'
 import Sidebar from './components/Sidebar.vue'
 import MainView from './components/MainView.vue'
 import FileBrowser from './components/FileBrowser.vue'
 import SettingsDialog from './components/SettingsDialog.vue'
 
 const modelStore = useModelStore()
+const eventStore = useEventStore()
 const showSettings = ref(false)
+let unsubscribeSSE: (() => void) | null = null
 
 onMounted(() => {
+  // 获取初始模型列表
   modelStore.fetchModels()
+
+  // 初始化 SSE 全局连接
+  unsubscribeSSE = eventStore.init()
+})
+
+onUnmounted(() => {
+  if (unsubscribeSSE) {
+    unsubscribeSSE()
+  }
 })
 </script>
 

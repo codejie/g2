@@ -9,7 +9,7 @@
 
         <!-- Model Selector -->
         <div class="flex items-center gap-2 bg-bg-100 px-3 py-1.5 rounded-full border border-border-200 cursor-pointer hover:bg-bg-200 transition-colors">
-          <el-dropdown @command="handleModelChange" trigger="click">
+          <el-dropdown @command="handleModelChange" trigger="click" popper-class="model-selector-dropdown">
             <div class="flex items-center gap-2 outline-none">
               <div class="w-2 h-2 rounded-full" :class="modelStore.loading ? 'bg-warning-100 animate-pulse' : 'bg-success-100'"></div>
               <span class="text-xs font-medium text-text-200">
@@ -18,11 +18,13 @@
               <ChevronDown :size="14" class="text-text-400" />
             </div>
             <template #dropdown>
-              <el-dropdown-menu>
-                <el-dropdown-item v-for="m in modelStore.models" :key="m.id" :command="m">
-                  <div class="flex flex-col">
-                    <span class="font-bold">{{ m.name }}</span>
-                    <span class="text-[10px] text-text-400">{{ m.providerName }}</span>
+              <el-dropdown-menu class="max-h-[400px] overflow-y-auto custom-scrollbar">
+                <el-dropdown-item v-for="m in modelStore.models" :key="m.id" :command="m" class="model-item">
+                  <div class="flex flex-col py-0.5">
+                    <span>
+                      <span class="text-xs font-bold">{{ m.name }}</span>
+                      <span class="ml-4 text-[10px] text-text-400">{{ m.providerName }}</span>
+                    </span>
                   </div>
                 </el-dropdown-item>
                 <el-dropdown-item v-if="!modelStore.models.length" disabled>No active models</el-dropdown-item>
@@ -58,3 +60,36 @@ const handleModelChange = (model: ModelInfo) => {
   modelStore.selectModel(model)
 }
 </script>
+
+<style>
+/* 调整 Dropdown 样式 */
+.model-selector-dropdown .el-dropdown-menu {
+  padding: 4px 0 !important;
+}
+
+.model-item {
+  padding: 4px 12px !important;
+  line-height: 1.2 !important;
+}
+
+.model-item:hover {
+  background-color: var(--bg-100) !important;
+}
+
+/* 自定义滚动条样式 */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: var(--border-300) !important; /* 加深颜色以更明显 */
+  border-radius: 10px;
+}
+/* 强制在非悬停状态也显示 */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-300) transparent;
+}
+</style>
