@@ -42,11 +42,30 @@ export const useServerStore = defineStore('server', () => {
     workspace.value = path
   }
 
+  const initializePaths = async () => {
+    try {
+      // 动态导入以避免循环依赖
+      const { getPath } = await import('../api/client')
+      const pathInfo = await getPath()
+      if (pathInfo && pathInfo.directory) {
+        // 如果当前是默认的相对路径，或者为空，则同步为服务器返回的真实绝对路径
+        if (workspace.value === './workspace' || !workspace.value) {
+          workspace.value = pathInfo.directory
+          localStorage.setItem('opencode_workspace', pathInfo.directory)
+          console.log('[ServerStore] Workspace synced to server path:', pathInfo.directory)
+        }
+      }
+    } catch (err) {
+      console.error('[ServerStore] Failed to sync path from server:', err)
+    }
+  }
+
   return {
     baseUrl,
     workspace,
     setBaseUrl,
     setWorkspace,
+    initializePaths,
     getActiveBaseUrl,
     getActiveWorkspace,
     getActiveServerId

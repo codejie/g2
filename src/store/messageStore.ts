@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import type { ApiMessageWithParts, ApiTextPart, PartDeltaPayload } from '../api/types'
+import type { ApiMessageWithParts, ApiTextPart } from '../api/types'
 import { getSessionMessages } from '../api/message'
 
 export const useMessageStore = defineStore('message', () => {
@@ -22,39 +22,109 @@ export const useMessageStore = defineStore('message', () => {
     messages.value = []
   }
 
-  // 手动添加用户消息 (在 API 返回前显示)
+  /**
+   * 1. 核心修复：更新 Part 类型并锁定，防止被后续错误字段覆盖
+   * 由 message.part.updated 事件触发
+   */
+  const updatePartType = (messageID: string, partID: string, type: string) => {
+    const messageIndex = messages.value.findIndex(m => (m.id === messageID || m.info?.id === messageID))
+    if (messageIndex === -1) return
+
+    const message = messages.value[messageIndex]
+    const partIndex = message.parts.findIndex((p: any) => p.id === partID)
+
+    if (partIndex === -1) {
+      // 预先创建 Part
+      message.parts.push({
+        id: partID,
+        type: type,
+        text: ''
+      } as any)
+    } else {
+      const part = message.parts[partIndex]
+      // 类型锁定：允许从 text 升级到 reasoning，但不允许降级
+      if (part.type !== type) {
+        if (part.type === 'text' && (type === 'reasoning' || type === 'thought' || type === 'thinking')) {
+          console.log(`[STORE-TYPE] Part ${partID} 升级为推理类型: ${type}`)
+          part.type = 'reasoning'
+          // 替换对象以触发 Vue 响应式
+          message.parts[partIndex] = { ...part }
+        } else if (type === 'text' && part.type === 'reasoning') {
+          // 拒绝降级
+          console.warn(`[STORE-TYPE] 拒绝将推理 Part ${partID} 降级为 text`)
+        } else {
+          part.type = type
+          message.parts[partIndex] = { ...part }
+        }
+      }
+    }
+
+    // 强制触发消息级更新
+    message.parts = [...message.parts]
+    messages.value[messageIndex] = { ...message }
+  }
+
+  // 手动添加用户消息
   const addUserMessage = (text: string) => {
     const userMsg: ApiMessageWithParts = {
-      id: `temp-${Date.now()}`,
-      role: 'user',
+      info: {
+        id: `temp-${Date.now()}`,
+        role: 'user',
+        time: { created: Date.now() },
+      } as any,
       parts: [{ type: 'text', text } as ApiTextPart],
-      createdAt: Date.now()
-    } as any
+    }
     messages.value.push(userMsg)
   }
 
-  // 处理 SSE 推送的消息增量 (Delta)
-  const handlePartDelta = (payload: PartDeltaPayload) => {
-    const { messageID, delta } = payload
+  /**
+   * 2. 处理增量内容
+   * 增加逻辑：如果 Part 已经是 reasoning，忽略 delta 包中的 field: "text"
+   */
+  const handlePartDelta = (payload: any) => {
+    const { messageID, partID, field, delta } = payload
 
-    // 查找对应消息
-    let message = messages.value.find(m => m.id === messageID)
+    let messageIndex = messages.value.findIndex(m => (m.id === messageID || m.info?.id === messageID))
 
-    if (!message) {
-      // 如果消息不存在，创建一个占位 (Assistant 消息)
-      message = {
-        id: messageID,
-        role: 'assistant',
-        parts: [{ type: 'text', text: '' } as ApiTextPart],
-        createdAt: Date.now(),
-      } as any
-      messages.value.push(message)
+    if (messageIndex === -1) {
+      const newMessage: ApiMessageWithParts = {
+        info: {
+          id: messageID,
+          role: 'assistant',
+          time: { created: Date.now() },
+        } as any,
+        parts: [],
+      }
+      messages.value.push(newMessage)
+      messageIndex = messages.value.length - 1
     }
 
-    // 更新最后一个 text part 的内容
-    const lastPart = message.parts[message.parts.length - 1]
-    if (lastPart && lastPart.type === 'text') {
-      (lastPart as ApiTextPart).text += delta
+    const message = messages.value[messageIndex]
+    let partIndex = message.parts.findIndex((p: any) => p.id === partID)
+
+    if (partIndex === -1) {
+      const type = (field === 'reasoning' || field === 'thought') ? 'reasoning' : 'text'
+      const newPart = {
+        id: partID,
+        type: type,
+        text: '',
+      } as any
+      message.parts.push(newPart)
+      partIndex = message.parts.length - 1
+    }
+
+    const part = message.parts[partIndex]
+
+    // 增量内容时的类型保护
+    if ((field === 'reasoning' || field === 'thought') && part.type !== 'reasoning') {
+      part.type = 'reasoning'
+    }
+
+    if (part.type === 'text' || part.type === 'reasoning') {
+      (part as any).text += (delta || '')
+      // 强制触发响应式
+      message.parts = [...message.parts]
+      messages.value[messageIndex] = { ...message }
     }
   }
 
@@ -64,6 +134,7 @@ export const useMessageStore = defineStore('message', () => {
     loadMessages,
     clearMessages,
     addUserMessage,
-    handlePartDelta
+    handlePartDelta,
+    updatePartType
   }
 })

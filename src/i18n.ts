@@ -18,16 +18,16 @@ for (const path in modules) {
   resources[lang][ns] = (modules[path] as any).default ?? modules[path]
 }
 
-// 获取持久化的语言设置，默认为 'en'
-const savedLng = localStorage.getItem('g2_language') || 'en'
+// 获取持久化的语言设置，默认为 'zh-CN'
+const savedLng = localStorage.getItem('g2_language') || 'zh-CN'
 
 i18n
   .init({
     resources,
     lng: savedLng, // 直接指定初始语言
-    fallbackLng: 'en',
+    fallbackLng: 'zh-CN',
     defaultNS: 'common',
-    ns: Object.keys(resources['en'] || {}),
+    ns: Object.keys(resources['zh-CN'] || {}),
     interpolation: {
       escapeValue: false, // Vue also escapes by default
     },

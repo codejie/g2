@@ -20,11 +20,11 @@
             </div>
 
             <!-- Title -->
-            <h2 class="text-2xl font-bold text-text-100 mb-2">How can I help you today?</h2>
+            <h2 class="text-2xl font-bold text-text-100 mb-2">{{ $t('home.welcome') }}</h2>
 
             <!-- Description -->
             <p class="text-text-400 max-w-md text-center text-sm leading-relaxed mb-8">
-              I'm G2, connected via {{ modelStore.selectedModel?.name }}. You can ask me to write code, debug, or explore your workspace.
+              {{ $t('home.description', { model: modelStore.selectedModel?.name }) }}
             </p>
 
             <!-- Chat Input Box (In Empty State) -->
@@ -34,8 +34,9 @@
                   <textarea
                     v-model="inputMessage"
                     class="w-full bg-transparent border-none focus:ring-0 p-4 pb-12 resize-none text-text-100 placeholder:text-text-400 min-h-[100px] outline-none"
-                    placeholder="Message G2..."
-                    @keydown.enter.exact.prevent="handleSendMessage"
+                    :placeholder="$t('home.placeholder')"
+                    @keydown.ctrl.enter="handleSendMessage"
+                    @keydown.meta.enter="handleSendMessage"
                   ></textarea>
                   <div class="absolute bottom-3 left-3 flex items-center gap-1">
                     <button class="p-2 hover:bg-bg-100 rounded-lg text-text-400 transition-colors">
@@ -53,6 +54,7 @@
                     <button
                       @click="handleSendMessage"
                       :disabled="chatStore.sending"
+                      title="Ctrl + Enter to send"
                       class="p-2 bg-accent-brand hover:bg-accent-main-000 text-white rounded-xl shadow-sm transition-all active:scale-95 disabled:opacity-50"
                     >
                       <ArrowUp v-if="!chatStore.sending" :size="20" />
@@ -68,20 +70,28 @@
           <div v-else class="max-w-3xl mx-auto w-full pt-8 space-y-8 pb-32">
             <div
               v-for="msg in messageStore.messages"
-              :key="msg.id"
+              :key="msg.info?.id || msg.id"
               class="flex gap-4 animate-in fade-in slide-in-from-bottom-2 duration-300"
             >
               <div class="w-8 h-8 rounded-full shrink-0 flex items-center justify-center text-white"
-                   :class="msg.role === 'user' ? 'bg-bg-300 text-text-200' : 'bg-accent-brand'">
-                <User v-if="msg.role === 'user'" :size="16" />
+                   :class="(msg.role === 'user' || msg.info?.role === 'user') ? 'bg-bg-300 text-text-200' : 'bg-accent-brand'">
+                <User v-if="msg.role === 'user' || msg.info?.role === 'user'" :size="16" />
                 <Sparkles v-else :size="18" />
               </div>
 
               <div class="space-y-2 flex-1 overflow-hidden min-w-0">
-                <div v-for="(part, idx) in msg.parts" :key="idx" class="text-text-100 leading-relaxed break-words whitespace-pre-wrap">
+                <div v-for="(part, idx) in msg.parts" :key="idx">
                   <template v-if="part.type === 'text'">
-                    {{ (part as any).text }}
+                    <div v-if="(part as any).text" class="text-text-100 leading-relaxed break-words whitespace-pre-wrap">
+                      {{ (part as any).text }}
+                    </div>
                   </template>
+                  <div v-else-if="part.type === 'reasoning' && (part as any).text.trim()" class="my-2 p-3 bg-bg-200/50 border-l-2 border-accent-brand/30 rounded-r-lg text-text-400 text-xs italic font-mono">
+                    <div class="mb-1 opacity-50 flex items-center gap-2 select-none">
+                      <Brain :size="12" /> Thinking...
+                    </div>
+                    <div class="whitespace-pre-wrap break-words">{{ (part as any).text.trim() }}</div>
+                  </div>
                   <div v-else-if="part.type === 'agent'" class="p-2 bg-bg-200 rounded-md text-xs font-mono">
                     Executing: {{ (part as any).name }}
                   </div>
@@ -102,8 +112,9 @@
                 <textarea
                   v-model="inputMessage"
                   class="w-full bg-transparent border-none focus:ring-0 p-4 pb-12 resize-none text-text-100 placeholder:text-text-400 min-h-[100px] outline-none"
-                  placeholder="Message G2..."
-                  @keydown.enter.exact.prevent="handleSendMessage"
+                  :placeholder="$t('home.placeholder')"
+                  @keydown.ctrl.enter="handleSendMessage"
+                  @keydown.meta.enter="handleSendMessage"
                 ></textarea>
                 <div class="absolute bottom-3 left-3 flex items-center gap-1">
                   <button class="p-2 hover:bg-bg-100 rounded-lg text-text-400 transition-colors">
@@ -118,11 +129,12 @@
                     <Zap :size="10" />
                     AUTO
                   </div>
-                  <button
-                    @click="handleSendMessage"
-                    :disabled="chatStore.sending"
-                    class="p-2 bg-accent-brand hover:bg-accent-main-000 text-white rounded-xl shadow-sm transition-all active:scale-95 disabled:opacity-50"
-                  >
+                    <button
+                      @click="handleSendMessage"
+                      :disabled="chatStore.sending"
+                      title="Ctrl + Enter to send"
+                      class="p-2 bg-accent-brand hover:bg-accent-main-000 text-white rounded-xl shadow-sm transition-all active:scale-95 disabled:opacity-50"
+                    >
                     <ArrowUp v-if="!chatStore.sending" :size="20" />
                     <Loader2 v-else :size="20" class="animate-spin" />
                   </button>
@@ -139,7 +151,7 @@
         class="flex-[4] border-t border-border-100 bg-bg-000 flex items-center justify-center"
       >
         <div class="text-text-400 text-sm italic">
-          Reserved Area (3:4 ratio)
+          {{ $t('home.reservedArea') }}
         </div>
       </div>
     </div>
@@ -155,7 +167,8 @@ import {
   ArrowUp,
   Zap,
   Loader2,
-  User
+  User,
+  Brain
 } from 'lucide-vue-next'
 import { useModelStore } from '../store/modelStore'
 import { useChatStore } from '../store/chatStore'

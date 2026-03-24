@@ -1,15 +1,15 @@
 <template>
   <el-dialog
     v-model="visible"
-    title="G2 Settings"
+    :title="$t('settings.title')"
     width="500"
     destroy-on-close
     align-center
     class="g2-settings-dialog"
   >
     <el-form label-position="top">
-      <el-form-item label="Language">
-        <el-select v-model="tempLanguage" placeholder="Select Language" class="w-full">
+      <el-form-item :label="$t('settings.language')">
+        <el-select v-model="tempLanguage" :placeholder="$t('settings.language')" class="w-full">
           <el-option label="English" value="en" />
           <el-option label="简体中文" value="zh-CN" />
           <template #prefix>
@@ -20,7 +20,7 @@
 
       <el-divider />
 
-      <el-form-item label="OpenCode Base URL">
+      <el-form-item :label="$t('settings.baseUrl')">
         <el-input
           v-model="tempBaseUrl"
           placeholder="e.g. http://127.0.0.1:4096"
@@ -31,14 +31,14 @@
           </template>
         </el-input>
         <div class="text-[10px] text-text-400 mt-1 flex justify-between">
-          <span>Env default: {{ envBaseUrl }}</span>
-          <el-link type="primary" :underline="false" style="font-size: 10px" @click="tempBaseUrl = envBaseUrl">Reset</el-link>
+          <span>{{ $t('settings.envDefault') }}: {{ envBaseUrl }}</span>
+          <el-link type="primary" :underline="false" style="font-size: 10px" @click="tempBaseUrl = envBaseUrl">{{ $t('settings.reset') }}</el-link>
         </div>
       </el-form-item>
 
       <el-divider />
 
-      <el-form-item label="Workspace Path">
+      <el-form-item :label="$t('settings.workspace')">
         <el-input
           v-model="tempWorkspace"
           placeholder="e.g. ./workspace"
@@ -49,17 +49,17 @@
           </template>
         </el-input>
         <div class="text-[10px] text-text-400 mt-1 flex justify-between">
-          <span>Env default: {{ envWorkspace }}</span>
-          <el-link type="primary" :underline="false" style="font-size: 10px" @click="tempWorkspace = envWorkspace">Reset</el-link>
+          <span>{{ $t('settings.envDefault') }}: {{ envWorkspace }}</span>
+          <el-link type="primary" :underline="false" style="font-size: 10px" @click="tempWorkspace = envWorkspace">{{ $t('settings.reset') }}</el-link>
         </div>
       </el-form-item>
     </el-form>
 
     <template #footer>
       <div class="flex gap-2 justify-end">
-        <el-button @click="visible = false">Cancel</el-button>
+        <el-button @click="visible = false">{{ $t('settings.cancel') }}</el-button>
         <el-button type="primary" @click="handleSave" :loading="saving">
-          Save Settings
+          {{ $t('settings.save') }}
         </el-button>
       </div>
     </template>
@@ -119,12 +119,12 @@ const handleSave = async () => {
     }
 
     ElMessage.success({
-      message: 'Settings saved and applied',
+      message: i18n.t('settings.success'),
       duration: 2000
     })
     visible.value = false
   } catch (err) {
-    ElMessage.error('Failed to save settings')
+    ElMessage.error(i18n.t('settings.error'))
   } finally {
     saving.value = false
   }

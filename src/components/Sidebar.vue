@@ -20,37 +20,48 @@
       >
         <Plus v-if="!chatStore.loading" :size="18" class="group-hover:rotate-90 transition-transform duration-300" />
         <Loader2 v-else :size="18" class="animate-spin" />
-        <span>{{ chatStore.loading ? '正在创建...' : '创建项目' }}</span>
+        <span>{{ chatStore.loading ? $t('sidebar.creating') : $t('sidebar.createProject') }}</span>
       </button>
     </div>
 
     <!-- Current Session Info -->
     <div v-if="chatStore.currentSession" class="px-2 py-1">
       <div class="px-4 py-2 text-[10px] font-bold text-text-400 uppercase tracking-wider">
-        当前会话
+        {{ $t('sidebar.currentSession') }}
       </div>
       <div class="px-3 py-2 rounded-xl bg-accent-brand/5 border border-accent-brand/10 flex items-center gap-3">
         <div class="w-2 h-2 rounded-full bg-success-100 animate-pulse"></div>
-        <div class="flex flex-col min-w-0">
+        <div class="flex flex-col min-w-0 flex-1">
           <span class="text-xs font-bold text-text-100 truncate">{{ chatStore.currentSession.id }}</span>
-          <span class="text-[10px] text-text-400 truncate">{{ chatStore.currentSession.title || 'Active Session' }}</span>
+          <span class="text-[10px] text-text-400 truncate">{{ chatStore.currentSession.title || $t('sidebar.activeSession') }}</span>
         </div>
       </div>
     </div>
 
-    <div class="px-4 py-2 text-[10px] font-bold text-text-400 uppercase tracking-wider">
-      项目列表
+    <div class="px-4 py-2 text-[10px] font-bold text-text-400 uppercase tracking-wider mt-2">
+      {{ $t('sidebar.sessionHistory') }}
     </div>
 
-    <!-- Chat List (Simulated Project List) -->
+    <!-- Session List -->
     <div class="flex-1 overflow-y-auto custom-scrollbar p-2 space-y-1">
+      <div v-if="chatStore.listLoading && chatStore.sessionList.length === 0" class="p-4 flex justify-center">
+        <Loader2 :size="20" class="animate-spin text-text-400" />
+      </div>
       <div
-        v-for="i in 5"
-        :key="i"
+        v-else-if="chatStore.sessionList.length === 0"
+        class="p-4 text-center text-xs text-text-400 italic"
+      >
+        {{ $t('sidebar.noHistory') }}
+      </div>
+      <div
+        v-for="session in chatStore.sessionList"
+        :key="session.id"
+        @click="handleSelectSession(session)"
         class="group px-3 py-2.5 rounded-xl hover:bg-bg-100 cursor-pointer text-sm text-text-200 flex items-center gap-3 transition-colors"
+        :class="[chatStore.currentSession?.id === session.id ? 'bg-bg-100 border-l-2 border-accent-brand pl-2.5' : '']"
       >
         <MessageSquare :size="16" class="shrink-0 text-text-400 group-hover:text-accent-brand transition-colors" />
-        <span class="truncate">Project {{ i }}</span>
+        <span class="truncate flex-1">{{ session.title || session.id }}</span>
       </div>
     </div>
 
@@ -61,7 +72,7 @@
         class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-bg-100 text-sm text-text-200 transition-colors group"
       >
         <Settings :size="18" class="text-text-400 group-hover:rotate-45 transition-transform duration-500" />
-        <span>Settings</span>
+        <span>{{ $t('sidebar.settings') }}</span>
       </button>
     </div>
   </aside>
@@ -87,7 +98,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import {
   Box,
   MessageSquare,
@@ -98,6 +109,7 @@ import {
   Loader2
 } from 'lucide-vue-next'
 import { useChatStore } from '../store/chatStore'
+import type { ApiSession } from '../api/types'
 
 const isCollapsed = ref(false)
 const chatStore = useChatStore()
@@ -110,8 +122,12 @@ const handleCreateProject = async () => {
   try {
     await chatStore.startNewSession()
   } catch (err) {
-    // 错误处理已在 store 中记录
+    console.error('Failed to create project:', err)
   }
+}
+
+const handleSelectSession = (session: ApiSession) => {
+  chatStore.selectSession(session)
 }
 
 defineEmits<{

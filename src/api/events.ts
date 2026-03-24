@@ -188,7 +188,7 @@ function connectViaBrowser() {
 }
 
 function broadcastEvent(globalEvent: GlobalEvent) {
-  console.log('[SSE] Received Event:', globalEvent)
+  console.log(`[SSE-INCOMING] Type: ${globalEvent.payload.type}`, globalEvent.payload.properties)
   const { type, properties } = globalEvent.payload
   allSubscribers.forEach(callbacks => {
     handleEventForSubscriber(type, properties, callbacks)
@@ -196,15 +196,19 @@ function broadcastEvent(globalEvent: GlobalEvent) {
 }
 
 function handleEventForSubscriber(type: string, properties: unknown, callbacks: EventCallbacks) {
-  // 简化版分发逻辑，后续可根据需要补全
   switch (type) {
+    case 'message.updated':
+      callbacks.onMessageUpdated?.(properties as any)
+      break
+    case 'message.part.updated':
+      callbacks.onPartUpdated?.(properties as any)
+      break
     case 'message.part.delta':
       callbacks.onPartDelta?.(properties as any)
       break
     case 'session.status':
       callbacks.onSessionStatus?.(properties as any)
       break
-    // ... 其他事件
   }
 }
 

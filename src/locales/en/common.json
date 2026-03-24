@@ -65,5 +65,32 @@
   "upDownSelect": "↑↓ select",
   "enterRun": "↵ run",
   "enterConfirmShort": "↵ confirm",
-  "escCancel": "esc cancel"
+  "escCancel": "esc cancel",
+  "sidebar": {
+    "createProject": "New Project",
+    "creating": "Creating...",
+    "currentSession": "Current Session",
+    "activeSession": "Active Session",
+    "sessionHistory": "Session History",
+    "noHistory": "No history available",
+    "settings": "Settings"
+  },
+  "home": {
+    "welcome": "How can I help you today?",
+    "description": "I'm G2, connected via {{model}}. You can ask me to write code, debug, or explore your workspace.",
+    "placeholder": "Message G2...",
+    "reservedArea": "Reserved Area (3:4 ratio)"
+  },
+  "settings": {
+    "title": "G2 Settings",
+    "language": "Language",
+    "baseUrl": "OpenCode Base URL",
+    "workspace": "Workspace Path",
+    "envDefault": "Env default",
+    "reset": "Reset",
+    "cancel": "Cancel",
+    "save": "Save Settings",
+    "success": "Settings saved and applied",
+    "error": "Failed to save settings"
+  }
 }

@@ -11,11 +11,20 @@ export const useEventStore = defineStore('event', () => {
   const connection = ref<ConnectionInfo>(getConnectionInfo())
   const lastEvent = ref<GlobalEvent | null>(null)
 
-  // 初始化 SSE 连接
   const init = () => {
     const callbacks: EventCallbacks = {
       onPartDelta: (payload) => {
         messageStore.handlePartDelta(payload)
+      },
+      onPartUpdated: (payload: any) => {
+        const part = payload.part
+        const mID = part.messageID || part.messageId || part.message_id
+        const pID = part.id || part.partID || part.id
+        const pType = part.type || part.field || part.type
+
+        if (mID && pID && pType) {
+          messageStore.updatePartType(mID, pID, pType)
+        }
       },
       onSessionStatus: (payload) => {
         console.log('[SSE] Session Status:', payload)
@@ -28,12 +37,9 @@ export const useEventStore = defineStore('event', () => {
       }
     }
 
-    // 订阅事件
     const unsubscribe = subscribeToEvents(callbacks)
 
-    // 监听 Server URL 变化，自动重连
     watch(() => serverStore.baseUrl, () => {
-      console.log('[SSE] Base URL changed, reconnecting...')
       reconnectSSE()
     })
 
