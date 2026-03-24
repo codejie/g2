@@ -82,9 +82,11 @@
               <div class="space-y-2 flex-1 overflow-hidden min-w-0">
                 <div v-for="(part, idx) in msg.parts" :key="idx">
                   <template v-if="part.type === 'text'">
-                    <div v-if="(part as any).text" class="text-text-100 leading-relaxed break-words whitespace-pre-wrap">
-                      {{ (part as any).text }}
-                    </div>
+                    <div
+                      v-if="(part as any).text"
+                      class="markdown-body text-text-100 leading-relaxed break-words"
+                      v-html="renderMarkdown((part as any).text)"
+                    ></div>
                   </template>
                   <div v-else-if="part.type === 'reasoning' && (part as any).text.trim()" class="my-2 p-3 bg-bg-200/50 border-l-2 border-accent-brand/30 rounded-r-lg text-text-400 text-xs italic font-mono">
                     <div class="mb-1 opacity-50 flex items-center gap-2 select-none">
@@ -173,6 +175,7 @@ import {
 import { useModelStore } from '../store/modelStore'
 import { useChatStore } from '../store/chatStore'
 import { useMessageStore } from '../store/messageStore'
+import { renderMarkdown } from '../utils/markdownUtils'
 
 const modelStore = useModelStore()
 const chatStore = useChatStore()
