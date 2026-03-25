@@ -87,7 +87,7 @@
     "welcome": "How can I help you today?",
     "description": "Hi, You can ask me to write code, debug, or explore your workspace.",
     "placeholder": "Showcase your ideas...",
-    "reservedArea": "Reserved Area (3:4 ratio)",
+    "reservedArea": "--",
     "actions": {
       "writing": "Writing",
       "page": "Page",
