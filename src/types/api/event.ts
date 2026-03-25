@@ -169,6 +169,7 @@ export const EventTypes = {
   PTY_UPDATED: 'pty.updated',
   PTY_EXITED: 'pty.exited',
   PTY_DELETED: 'pty.deleted',
+  SERVER_HEARTBEAT: 'server.heartbeat',
 } as const
 
 export type EventType = (typeof EventTypes)[keyof typeof EventTypes]
@@ -201,6 +202,7 @@ export interface EventCallbacks {
   onWorktreeReady?: (data: WorktreeReadyPayload) => void
   onWorktreeFailed?: (data: WorktreeFailedPayload) => void
   onVcsBranchUpdated?: (data: VcsBranchUpdatedPayload) => void
+  onServerHeartbeat?: (data: any) => void
   onError?: (error: Error) => void
   /** SSE 重连成功后触发，通知订阅者可能需要刷新数据
    * @param reason - 重连原因：'network' 普通网络恢复, 'server-switch' 切换了服务器

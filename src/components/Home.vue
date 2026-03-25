@@ -22,52 +22,12 @@
             <!-- Title -->
             <h2 class="text-2xl font-bold text-text-100 mb-2">{{ $t('home.welcome') }}</h2>
 
-            <!-- Description -->
-            <p class="text-text-400 max-w-md text-center text-sm leading-relaxed mb-8">
-              {{ $t('home.description', { model: modelStore.selectedModel?.name }) }}
-            </p>
-
             <!-- Chat Input Box (In Empty State) -->
-            <div class="w-full">
-              <div class="relative group">
-                <div class="bg-bg-000 border border-border-200 focus-within:border-accent-brand/50 rounded-2xl shadow-float transition-all duration-200 relative">
-                  <textarea
-                    v-model="inputMessage"
-                    class="w-full bg-transparent border-none focus:ring-0 p-4 pb-12 resize-none text-text-100 placeholder:text-text-400 min-h-[100px] outline-none"
-                    :placeholder="$t('home.placeholder')"
-                    @keydown.ctrl.enter="handleSendMessage"
-                    @keydown.meta.enter="handleSendMessage"
-                  ></textarea>
-                  <div class="absolute bottom-3 left-3 flex items-center gap-1">
-                    <button class="p-2 hover:bg-bg-100 rounded-lg text-text-400 transition-colors">
-                      <Paperclip :size="18" />
-                    </button>
-                    <button class="p-2 hover:bg-bg-100 rounded-lg text-text-400 transition-colors">
-                      <Globe :size="18" />
-                    </button>
-                  </div>
-                  <div class="absolute bottom-3 right-3 flex items-center gap-2">
-                    <div class="flex items-center gap-1 px-2 py-1 rounded-md bg-bg-100 text-[10px] font-bold text-text-300 border border-border-100">
-                      <Zap :size="10" />
-                      AUTO
-                    </div>
-                    <button
-                      @click="handleSendMessage"
-                      :disabled="chatStore.sending"
-                      title="Ctrl + Enter to send"
-                      class="p-2 bg-accent-brand hover:bg-accent-main-000 text-white rounded-xl shadow-sm transition-all active:scale-95 disabled:opacity-50"
-                    >
-                      <ArrowUp v-if="!chatStore.sending" :size="20" />
-                      <Loader2 v-else :size="20" class="animate-spin" />
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <ChatInput />
           </div>
 
           <!-- Case 2: Chat state (With messages) -->
-          <div v-else class="max-w-3xl mx-auto w-full pt-8 space-y-8 pb-32">
+          <div v-else class="max-w-3xl mx-auto w-full pt-8 space-y-8 pb-40">
             <div
               v-for="msg in messageStore.messages"
               :key="msg.info?.id || msg.id"
@@ -108,51 +68,19 @@
           v-if="chatStore.hasSession"
           class="absolute bottom-0 left-0 right-0 z-10 bg-gradient-to-t from-bg-100 via-bg-100/90 to-transparent pt-12 px-4 pb-4"
         >
-          <div class="max-w-3xl mx-auto w-full">
-            <div class="relative group">
-              <div class="bg-bg-000 border border-border-200 focus-within:border-accent-brand/50 rounded-2xl shadow-float transition-all duration-200 relative">
-                <textarea
-                  v-model="inputMessage"
-                  class="w-full bg-transparent border-none focus:ring-0 p-4 pb-12 resize-none text-text-100 placeholder:text-text-400 min-h-[100px] outline-none"
-                  :placeholder="$t('home.placeholder')"
-                  @keydown.ctrl.enter="handleSendMessage"
-                  @keydown.meta.enter="handleSendMessage"
-                ></textarea>
-                <div class="absolute bottom-3 left-3 flex items-center gap-1">
-                  <button class="p-2 hover:bg-bg-100 rounded-lg text-text-400 transition-colors">
-                    <Paperclip :size="18" />
-                  </button>
-                  <button class="p-2 hover:bg-bg-100 rounded-lg text-text-400 transition-colors">
-                    <Globe :size="18" />
-                  </button>
-                </div>
-                <div class="absolute bottom-3 right-3 flex items-center gap-2">
-                  <div class="flex items-center gap-1 px-2 py-1 rounded-md bg-bg-100 text-[10px] font-bold text-text-300 border border-border-100">
-                    <Zap :size="10" />
-                    AUTO
-                  </div>
-                    <button
-                      @click="handleSendMessage"
-                      :disabled="chatStore.sending"
-                      title="Ctrl + Enter to send"
-                      class="p-2 bg-accent-brand hover:bg-accent-main-000 text-white rounded-xl shadow-sm transition-all active:scale-95 disabled:opacity-50"
-                    >
-                    <ArrowUp v-if="!chatStore.sending" :size="20" />
-                    <Loader2 v-else :size="20" class="animate-spin" />
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
+          <ChatInput :is-floating="true" />
         </div>
       </div>
 
       <!-- Lower Section: Reserved Space (Visible only when no messages) -->
       <div
         v-if="!chatStore.hasSession"
-        class="flex-[4] border-t border-border-100 bg-bg-000 flex items-center justify-center"
+        class="flex-[4] border-t border-border-100 bg-bg-000 flex items-center justify-center relative overflow-hidden"
       >
-        <div class="text-text-400 text-sm italic">
+        <!-- Diagonally striped background -->
+        <div class="absolute inset-0 opacity-[0.03] pointer-events-none stripes-bg"></div>
+
+        <div class="text-text-400 text-sm italic z-10">
           {{ $t('home.reservedArea') }}
         </div>
       </div>
@@ -164,24 +92,17 @@
 import { ref, watch, nextTick } from 'vue'
 import {
   Sparkles,
-  Paperclip,
-  Globe,
-  ArrowUp,
-  Zap,
-  Loader2,
   User,
   Brain
 } from 'lucide-vue-next'
-import { useModelStore } from '../store/modelStore'
 import { useChatStore } from '../store/chatStore'
 import { useMessageStore } from '../store/messageStore'
 import { renderMarkdown } from '../utils/markdownUtils'
+import ChatInput from './ChatInput.vue'
 
-const modelStore = useModelStore()
 const chatStore = useChatStore()
 const messageStore = useMessageStore()
 
-const inputMessage = ref('')
 const scrollContainer = ref<HTMLElement | null>(null)
 
 // 自动滚动到底部
@@ -196,35 +117,28 @@ const scrollToBottom = async () => {
 watch(() => messageStore.messages, () => {
   scrollToBottom()
 }, { deep: true })
-
-const handleSendMessage = async () => {
-  const text = inputMessage.value.trim()
-  if (!text || chatStore.sending) return
-
-  try {
-    // 1. 在 UI 上先添加用户消息
-    messageStore.addUserMessage(text)
-    inputMessage.value = ''
-
-    // 2. 异步发送到后端
-    await chatStore.sendPrompt(text)
-  } catch (err) {
-    console.error('Failed to send message:', err)
-    inputMessage.value = text
-  }
-}
 </script>
 
 <style scoped>
-.shadow-float {
-  box-shadow: 0 4px 20px 0 rgb(0 0 0 / 0.1);
-}
-
 .custom-scrollbar::-webkit-scrollbar {
   width: 6px;
 }
 .custom-scrollbar::-webkit-scrollbar-thumb {
   background-color: hsl(var(--border-300) / 0.4);
   border-radius: 99px;
+}
+
+.stripes-bg {
+  background-image: linear-gradient(
+    45deg,
+    currentColor 12.5%,
+    transparent 12.5%,
+    transparent 50%,
+    currentColor 50%,
+    currentColor 62.5%,
+    transparent 62.5%,
+    transparent 100%
+  );
+  background-size: 8px 8px;
 }
 </style>

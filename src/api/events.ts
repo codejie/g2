@@ -209,6 +209,9 @@ function handleEventForSubscriber(type: string, properties: unknown, callbacks: 
     case 'session.status':
       callbacks.onSessionStatus?.(properties as any)
       break
+    case 'server.heartbeat':
+      callbacks.onServerHeartbeat?.(properties as any)
+      break
   }
 }
 

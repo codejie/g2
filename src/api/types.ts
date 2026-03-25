@@ -120,6 +120,8 @@ export interface SendMessageParams {
   }
   agent?: string
   variant?: string
+  /** 模式 (PLAN/BUILD) */
+  mode?: string
   /** 工作目录（项目目录） */
   directory?: string
 }

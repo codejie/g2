@@ -2,7 +2,7 @@
   <div class="space-y-0.5">
     <!-- Folder/File Item -->
     <div
-      class="flex items-center gap-2 px-2 py-1 rounded cursor-pointer transition-colors group"
+      class="flex items-center gap-2 px-2 py-1 rounded cursor-pointer transition-colors group relative"
       :class="[isSelected ? 'bg-accent-brand/10 text-accent-brand' : 'hover:bg-bg-100 text-text-200']"
       :style="{ paddingLeft: `${depth * 12 + 8}px` }"
       @click="toggle"
@@ -27,7 +27,16 @@
 
       <File v-else :size="14" class="text-text-500 shrink-0" />
 
-      <span class="text-xs truncate font-medium">{{ node.name }}</span>
+      <span class="text-xs truncate font-medium flex-1">{{ node.name }}</span>
+
+      <!-- Download Button (Visible on Hover) -->
+      <button
+        @click.stop="handleDownload"
+        class="opacity-0 group-hover:opacity-100 p-1 hover:bg-bg-200 rounded text-text-400 transition-all shrink-0 active:scale-95"
+        :title="$t('download')"
+      >
+        <Download :size="12" />
+      </button>
     </div>
 
     <!-- Recursive Sub-tree -->
@@ -60,9 +69,14 @@ import {
   File,
   ChevronRight,
   ChevronDown,
-  Loader2
+  Loader2,
+  Download
 } from 'lucide-vue-next'
-import { listDirectory } from '../api/file'
+import { listDirectory, getFileDownloadUrl } from '../api/file'
+import { downloadFromUrl } from '../utils/downloadUtils'
+import { useServerStore } from '../store/serverStore'
+import { ElMessageBox } from 'element-plus'
+import i18n from '../i18n'
 import type { FileNode } from '../api/types'
 
 const props = defineProps<{
@@ -75,10 +89,10 @@ const emit = defineEmits<{
   (e: 'select', node: FileNode): void
 }>()
 
+const serverStore = useServerStore()
 const isExpanded = ref(false)
 const children = ref<FileNode[]>([])
 const loading = ref(false)
-const workspacePath = import.meta.env.VITE_WORKSPACE || './'
 
 const toggle = async () => {
   if (props.node.type === 'file') {
@@ -92,14 +106,35 @@ const toggle = async () => {
   if (isExpanded.value && !children.value.length) {
     loading.value = true
     try {
-      // 获取子目录列表
-      children.value = await listDirectory(props.node.path, workspacePath)
+      // 获取子目录列表，传入当前工作区
+      children.value = await listDirectory(props.node.path, serverStore.workspace)
     } catch (err) {
       console.error('Failed to expand directory:', err)
       isExpanded.value = false
     } finally {
       loading.value = false
     }
+  }
+}
+
+const handleDownload = async () => {
+  const isDir = props.node.type === 'directory'
+  const confirmMsg = isDir
+    ? i18n.t('file.downloadConfirmDir', { name: props.node.name })
+    : i18n.t('file.downloadConfirm', { name: props.node.name })
+
+  try {
+    await ElMessageBox.confirm(confirmMsg, i18n.t('download'), {
+      confirmButtonText: i18n.t('confirm'),
+      cancelButtonText: i18n.t('cancel'),
+      type: 'info',
+    })
+
+    const url = getFileDownloadUrl(props.node.path, serverStore.workspace)
+    const downloadName = isDir ? `${props.node.name}.zip` : props.node.name
+    await downloadFromUrl(url, downloadName)
+  } catch (err) {
+    // cancelled
   }
 }
 </script>

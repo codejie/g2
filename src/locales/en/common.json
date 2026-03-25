@@ -1,5 +1,6 @@
 {
   "loading": "Loading...",
+  "app_title": "AppGenius",
   "cancel": "Cancel",
   "close": "Close",
   "closeAllTabs": "Close all tabs",
@@ -67,22 +68,50 @@
   "enterConfirmShort": "↵ confirm",
   "escCancel": "esc cancel",
   "sidebar": {
-    "createProject": "New Project",
+    "newChat": "New Chat",
     "creating": "Creating...",
     "currentSession": "Current Session",
     "activeSession": "Active Session",
     "sessionHistory": "Session History",
     "noHistory": "No history available",
-    "settings": "Settings"
+    "settings": "Settings",
+    "rename": "Rename",
+    "delete": "Delete",
+    "deleteConfirmTitle": "Delete Session",
+    "deleteConfirmDesc": "Are you sure you want to delete this session? This action cannot be undone.",
+    "deleteSuccess": "Session deleted successfully",
+    "deleteError": "Failed to delete session"
   },
   "home": {
     "welcome": "How can I help you today?",
-    "description": "I'm G2, connected via {{model}}. You can ask me to write code, debug, or explore your workspace.",
-    "placeholder": "Message G2...",
-    "reservedArea": "Reserved Area (3:4 ratio)"
+    "description": "Hi, You can ask me to write code, debug, or explore your workspace.",
+    "placeholder": "Showcase your ideas...",
+    "reservedArea": "Reserved Area (3:4 ratio)",
+    "actions": {
+      "writing": "Writing",
+      "page": "Page",
+      "app": "App",
+      "miniapp": "Mini App",
+      "ppt": "PPT",
+      "excel": "Excel"
+    },
+    "prompts": {
+      "writing": "Help me write a document about ",
+      "page": "Create a modern web page for ",
+      "app": "Design a desktop application for ",
+      "miniapp": "Develop a WeChat Mini Program for ",
+      "ppt": "Outline a presentation for ",
+      "excel": "Create an Excel formula or spreadsheet structure for "
+    },
+    "modes": {
+      "build": "BUILD",
+      "buildDesc": "Full capability mode",
+      "plan": "PLAN",
+      "planDesc": "Architectural planning"
+    }
   },
   "settings": {
-    "title": "G2 Settings",
+    "title": "Settings",
     "language": "Language",
     "baseUrl": "OpenCode Base URL",
     "workspace": "Workspace Path",
@@ -92,5 +121,17 @@
     "save": "Save Settings",
     "success": "Settings saved and applied",
     "error": "Failed to save settings"
+  },
+  "workspace": {
+    "title": "Workspace"
+  },
+  "models": {
+    "loading": "Loading models...",
+    "noActive": "No active models"
+  },
+  "file": {
+    "downloadConfirm": "Are you sure you want to download \"{{name}}\"?",
+    "downloadConfirmDir": "Are you sure you want to compress and download the directory \"{{name}}\"?",
+    "downloading": "Downloading..."
   }
 }

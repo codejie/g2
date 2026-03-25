@@ -10,6 +10,19 @@ export const useEventStore = defineStore('event', () => {
   const messageStore = useMessageStore()
   const connection = ref<ConnectionInfo>(getConnectionInfo())
   const lastEvent = ref<GlobalEvent | null>(null)
+  const lastHeartbeatTime = ref<number>(Date.now())
+  const isServerActive = ref<boolean>(true)
+
+  let heartbeatCheckTimer: ReturnType<typeof setTimeout> | null = null
+
+  const startHeartbeatCheck = () => {
+    if (heartbeatCheckTimer) clearInterval(heartbeatCheckTimer)
+    heartbeatCheckTimer = setInterval(() => {
+      const now = Date.now()
+      // 如果超过 30 秒没有收到心跳，标记为不活跃
+      isServerActive.value = (now - lastHeartbeatTime.value) < 30000
+    }, 5000)
+  }
 
   const init = () => {
     const callbacks: EventCallbacks = {
@@ -29,26 +42,37 @@ export const useEventStore = defineStore('event', () => {
       onSessionStatus: (payload) => {
         console.log('[SSE] Session Status:', payload)
       },
+      onServerHeartbeat: () => {
+        lastHeartbeatTime.value = Date.now()
+        isServerActive.value = true
+      },
       onError: (error) => {
         console.error('[SSE] Error:', error)
       },
       onReconnected: (reason) => {
         console.log('[SSE] Reconnected:', reason)
+        lastHeartbeatTime.value = Date.now()
+        isServerActive.value = true
       }
     }
 
     const unsubscribe = subscribeToEvents(callbacks)
+    startHeartbeatCheck()
 
     watch(() => serverStore.baseUrl, () => {
       reconnectSSE()
     })
 
-    return unsubscribe
+    return () => {
+      unsubscribe()
+      if (heartbeatCheckTimer) clearInterval(heartbeatCheckTimer)
+    }
   }
 
   return {
     connection,
     lastEvent,
+    isServerActive,
     init
   }
 })

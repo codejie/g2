@@ -120,6 +120,9 @@ export async function updateProject(
 // Path API Functions
 // ============================================
 
-export async function getPath(): Promise<ApiPath> {
-  return get<ApiPath>('/path')
+/**
+ * GET /path - 获取路径信息
+ */
+export async function getPath(directory?: string): Promise<ApiPath> {
+  return get<ApiPath>('/path', { directory: formatPathForApi(directory) })
 }

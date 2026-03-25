@@ -3,7 +3,7 @@
     <div class="p-3 border-b border-border-100 flex items-center justify-between">
       <div class="flex items-center gap-2">
         <FolderOpen :size="16" class="text-accent-brand" />
-        <span class="text-xs font-bold text-text-200 uppercase tracking-wider">Workspace</span>
+        <span class="text-xs font-bold text-text-200 uppercase tracking-wider">{{ $t('workspace.title') }}</span>
       </div>
       <button @click="refresh" :class="{ 'animate-spin': loading }" class="p-1 hover:bg-bg-100 rounded text-text-400">
         <RotateCw :size="14" />
@@ -31,41 +31,50 @@
       </div>
     </div>
 
-    <div class="p-2 border-t border-border-100 bg-bg-100">
-      <div class="flex items-center gap-2 px-2 py-1.5 rounded bg-bg-000 border border-border-200 text-[10px] text-text-300">
-        <Monitor :size="12" />
-        <span class="truncate">{{ workspacePath }}</span>
+    <div class="px-4 py-3 border-t border-border-100 bg-bg-000">
+      <div class="flex items-center gap-2 text-[10px] text-text-400 font-medium">
+        <Monitor :size="12" class="opacity-70" />
+        <span class="truncate opacity-70">{{ serverStore.workspace }}</span>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { FolderOpen, RotateCw, Search, Monitor } from 'lucide-vue-next'
 import { listDirectory } from '../api/file'
+import { useServerStore } from '../store/serverStore'
 import type { FileNode } from '../api/types'
 import FileTreeItem from './FileTreeItem.vue'
 
+const emit = defineEmits(['select-file'])
+const serverStore = useServerStore()
 const files = ref<FileNode[]>([])
 const loading = ref(false)
-const workspacePath = import.meta.env.VITE_WORKSPACE || './'
 
 const refresh = async () => {
+  if (!serverStore.workspace) return
   loading.value = true
   try {
     // 列出根目录
-    files.value = await listDirectory('.', workspacePath)
+    files.value = await listDirectory('.', serverStore.workspace)
   } catch (err) {
     console.error('Failed to list workspace:', err)
+    files.value = []
   } finally {
     loading.value = false
   }
 }
 
 const handleFileSelect = (node: FileNode) => {
-  console.log('Selected file:', node.path)
+  if (node.type === 'file') {
+    emit('select-file', node.path)
+  }
 }
+
+// 监听工作区变化自动刷新
+watch(() => serverStore.workspace, refresh)
 
 onMounted(refresh)
 </script>

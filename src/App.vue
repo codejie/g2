@@ -2,16 +2,14 @@
   <div class="relative h-[var(--app-height)] flex bg-bg-100 overflow-hidden"
        :style="{ paddingTop: 'var(--safe-area-inset-top)' }">
 
-    <!-- Sidebar Component -->
+    <!-- Left Sidebar -->
     <Sidebar @open-settings="showSettings = true" />
 
     <!-- Main Content Area -->
     <MainView />
 
-    <!-- Right Panel -->
-    <aside class="hidden xl:flex w-80 border-l border-border-100 bg-bg-000 flex-col">
-      <FileBrowser />
-    </aside>
+    <!-- Right Workspace Sidebar -->
+    <WorkspaceSidebar class="hidden xl:flex" />
 
     <!-- Dialogs -->
     <SettingsDialog v-model="showSettings" />
@@ -26,7 +24,7 @@ import { useServerStore } from './store/serverStore'
 import { useChatStore } from './store/chatStore'
 import Sidebar from './components/Sidebar.vue'
 import MainView from './components/MainView.vue'
-import FileBrowser from './components/FileBrowser.vue'
+import WorkspaceSidebar from './components/WorkspaceSidebar.vue'
 import SettingsDialog from './components/SettingsDialog.vue'
 
 const modelStore = useModelStore()

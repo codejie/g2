@@ -133,7 +133,7 @@ function buildSendMessageBody(params: SendMessageParams): {
   query: Record<string, string | undefined>
   body: Record<string, unknown>
 } {
-  const { sessionId, text, attachments, model, agent, variant, directory } = params
+  const { sessionId, text, attachments, model, agent, variant, mode, directory } = params
 
   const parts: Array<{ type: string; [key: string]: unknown }> = []
 
@@ -195,6 +195,10 @@ function buildSendMessageBody(params: SendMessageParams): {
 
   if (variant) {
     requestBody.variant = variant
+  }
+
+  if (mode) {
+    requestBody.mode = mode
   }
 
   return {

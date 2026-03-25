@@ -111,7 +111,8 @@ const handleSave = async () => {
   saving.value = true
   try {
     serverStore.setBaseUrl(tempBaseUrl.value)
-    serverStore.setWorkspace(tempWorkspace.value)
+    // 等待工作区切换完成，因为它是异步调用 API 了
+    await serverStore.setWorkspace(tempWorkspace.value)
 
     // 切换语言
     if (i18n.language !== tempLanguage.value) {
@@ -124,6 +125,7 @@ const handleSave = async () => {
     })
     visible.value = false
   } catch (err) {
+    console.error('Save settings failed:', err)
     ElMessage.error(i18n.t('settings.error'))
   } finally {
     saving.value = false

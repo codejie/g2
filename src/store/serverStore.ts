@@ -38,17 +38,48 @@ export const useServerStore = defineStore('server', () => {
     }
   }
 
-  const setWorkspace = (path: string) => {
+  const setWorkspace = async (path: string) => {
     workspace.value = path
+    localStorage.setItem('opencode_workspace', path)
+
+    try {
+      const { updateConfig, getPath } = await import('../api/client')
+      // 通知服务器切换目录
+      await updateConfig({}, path)
+      // 获取服务器确认后的绝对路径
+      const pathInfo = await getPath(path)
+      if (pathInfo && pathInfo.directory) {
+        workspace.value = pathInfo.directory
+        localStorage.setItem('opencode_workspace', pathInfo.directory)
+      }
+      console.log('[ServerStore] Workspace changed and synced:', workspace.value)
+    } catch (err) {
+      console.error('[ServerStore] Failed to sync workspace change to server:', err)
+      throw err
+    }
   }
 
   const initializePaths = async () => {
     try {
-      // 动态导入以避免循环依赖
-      const { getPath } = await import('../api/client')
-      const pathInfo = await getPath()
+      const { getPath, updateConfig } = await import('../api/client')
+
+      // 1. 如果本地已经有持久化的非默认工作区，先尝试设置给服务器
+      const savedWorkspace = localStorage.getItem('opencode_workspace')
+      if (savedWorkspace && savedWorkspace !== './workspace') {
+        try {
+          // 通过发送带 directory 的空配置更新来初始化该工作区
+          await updateConfig({}, savedWorkspace)
+          workspace.value = savedWorkspace
+          console.log('[ServerStore] Informed server about saved workspace:', savedWorkspace)
+        } catch (err) {
+          console.warn('[ServerStore] Failed to set workspace on server:', err)
+        }
+      }
+
+      // 2. 同步服务器当前路径
+      const pathInfo = await getPath(workspace.value !== './workspace' ? workspace.value : undefined)
       if (pathInfo && pathInfo.directory) {
-        // 如果当前是默认的相对路径，或者为空，则同步为服务器返回的真实绝对路径
+        // 如果本地是默认值，或者获取到了更准确的路径，则同步
         if (workspace.value === './workspace' || !workspace.value) {
           workspace.value = pathInfo.directory
           localStorage.setItem('opencode_workspace', pathInfo.directory)
@@ -56,7 +87,7 @@ export const useServerStore = defineStore('server', () => {
         }
       }
     } catch (err) {
-      console.error('[ServerStore] Failed to sync path from server:', err)
+      console.error('[ServerStore] Failed to initialize paths:', err)
     }
   }
 

@@ -1,11 +1,16 @@
 <template>
   <main class="flex-1 flex min-w-0 h-full overflow-hidden flex-col">
     <!-- Header -->
-    <header class="h-14 border-b border-border-100 flex items-center justify-between px-4 bg-bg-000/80 backdrop-blur-md z-20 shrink-0">
+    <header class="h-14 border-b border-border-100 flex items-center justify-between px-4 bg-bg-000/80 backdrop-blur-md z-20 shrink-0 sticky top-0">
       <div class="flex items-center gap-3">
-        <button class="md:hidden p-2 hover:bg-bg-100 rounded-lg">
-          <Menu :size="20" />
-        </button>
+        <!-- Logo & Brand (Visible when sidebar is collapsed) -->
+        <div v-if="chatStore.isSidebarCollapsed" class="flex items-center gap-3 mr-2 animate-in fade-in slide-in-from-left-2 duration-300">
+          <div class="w-8 h-8 rounded-lg bg-accent-brand flex items-center justify-center text-white shrink-0 shadow-sm">
+            <Box :size="20" />
+          </div>
+          <span class="font-bold text-text-100 truncate tracking-tight">{{ $t('app_title') }}</span>
+          <div class="w-px h-4 bg-border-200 mx-1"></div>
+        </div>
 
         <!-- Model Selector -->
         <div class="flex items-center gap-2 bg-bg-100 px-3 py-1.5 rounded-full border border-border-200 cursor-pointer hover:bg-bg-200 transition-colors">
@@ -13,7 +18,7 @@
             <div class="flex items-center gap-2 outline-none">
               <div class="w-2 h-2 rounded-full" :class="modelStore.loading ? 'bg-warning-100 animate-pulse' : 'bg-success-100'"></div>
               <span class="text-xs font-medium text-text-200">
-                {{ modelStore.selectedModel?.name || 'Loading models...' }}
+                {{ modelStore.selectedModel?.name || $t('models.loading') }}
               </span>
               <ChevronDown :size="14" class="text-text-400" />
             </div>
@@ -27,7 +32,7 @@
                     </span>
                   </div>
                 </el-dropdown-item>
-                <el-dropdown-item v-if="!modelStore.models.length" disabled>No active models</el-dropdown-item>
+                <el-dropdown-item v-if="!modelStore.models.length" disabled>{{ $t('models.noActive') }}</el-dropdown-item>
               </el-dropdown-menu>
             </template>
           </el-dropdown>
@@ -35,7 +40,10 @@
       </div>
 
       <div class="flex items-center gap-2">
-        <button class="p-2 hover:bg-bg-100 rounded-lg text-text-300">
+        <button
+          class="p-2 hover:bg-bg-100 rounded-lg transition-colors"
+          :class="[eventStore.isServerActive ? 'text-accent-brand' : 'text-text-400 opacity-50 cursor-not-allowed']"
+        >
           <Share2 :size="18" />
         </button>
       </div>
@@ -49,12 +57,16 @@
 </template>
 
 <script setup lang="ts">
-import { Menu, ChevronDown, Share2 } from 'lucide-vue-next'
+import { Menu, ChevronDown, Share2, Box } from 'lucide-vue-next'
 import { useModelStore } from '../store/modelStore'
+import { useChatStore } from '../store/chatStore'
+import { useEventStore } from '../store/eventStore'
 import Home from './Home.vue'
 import type { ModelInfo } from '../types/ui'
 
 const modelStore = useModelStore()
+const chatStore = useChatStore()
+const eventStore = useEventStore()
 
 const handleModelChange = (model: ModelInfo) => {
   modelStore.selectModel(model)

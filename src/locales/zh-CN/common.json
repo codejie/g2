@@ -1,5 +1,6 @@
 {
   "loading": "加载中...",
+  "app_title": "AppGenius",
   "cancel": "取消",
   "close": "关闭",
   "closeAllTabs": "关闭全部标签",
@@ -67,22 +68,50 @@
   "enterConfirmShort": "↵ 确认",
   "escCancel": "Esc 取消",
   "sidebar": {
-    "createProject": "创建项目",
+    "newChat": "新会话",
     "creating": "正在创建...",
     "currentSession": "当前会话",
     "activeSession": "活跃会话",
     "sessionHistory": "会话历史",
     "noHistory": "暂无会话历史",
-    "settings": "设置"
+    "settings": "设置",
+    "rename": "重命名",
+    "delete": "删除",
+    "deleteConfirmTitle": "删除确认",
+    "deleteConfirmDesc": "确定要删除该会话吗？此操作不可撤销。",
+    "deleteSuccess": "会话已删除",
+    "deleteError": "删除会话失败"
   },
   "home": {
     "welcome": "今天我能帮您做些什么？",
-    "description": "我是 G2，已连接到 {{model}}。你可以让我写代码、调试或探索你的工作区。",
-    "placeholder": "给 G2 发送消息...",
-    "reservedArea": "预留区域 (3:4 比例)"
+    "description": "嗨，你可以让我写代码、调试或探索你的工作区。",
+    "placeholder": "展现你的创意...",
+    "reservedArea": "--",
+    "actions": {
+      "writing": "写作",
+      "page": "页面",
+      "app": "应用",
+      "miniapp": "小程序",
+      "ppt": "PPT",
+      "excel": "Excel"
+    },
+    "prompts": {
+      "writing": "帮我写一篇关于 ",
+      "page": "为以下内容创建一个现代网页：",
+      "app": "设计一个桌面应用程序，用于：",
+      "miniapp": "开发一个微信小程序，功能如下：",
+      "ppt": "为以下主题设计一个演示文稿大纲：",
+      "excel": "为以下需求创建 Excel 公式或表格结构："
+    },
+    "modes": {
+      "build": "BUILD",
+      "buildDesc": "全功能开发模式",
+      "plan": "PLAN",
+      "planDesc": "架构规划模式"
+    }
   },
   "settings": {
-    "title": "G2 设置",
+    "title": "设置",
     "language": "语言",
     "baseUrl": "OpenCode 服务地址",
     "workspace": "工作区路径",
@@ -92,5 +121,17 @@
     "save": "保存设置",
     "success": "设置已保存并生效",
     "error": "保存设置失败"
+  },
+  "workspace": {
+    "title": "工作区"
+  },
+  "models": {
+    "loading": "正在加载模型...",
+    "noActive": "暂无可用模型"
+  },
+  "file": {
+    "downloadConfirm": "确定要下载 \"{{name}}\" 吗？",
+    "downloadConfirmDir": "确定要将目录 \"{{name}}\" 打包并下载吗？",
+    "downloading": "正在下载..."
   }
 }

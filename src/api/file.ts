@@ -3,7 +3,7 @@
 // 基于 OpenAPI: /file, /find/file, /find/symbol 相关接口
 // ============================================
 
-import { get } from './http'
+import { get, buildUrl } from './http'
 import { formatPathForApi } from '../utils/directoryUtils'
 import type { FileNode, FileContent, FileStatusItem, SymbolInfo } from './types'
 import { serverStore } from '../store/serverStore'
@@ -51,6 +51,16 @@ export async function searchFiles(
     directory: formatPathForApi(options.directory),
     type: options.type,
     limit: options.limit,
+  })
+}
+
+/**
+ * 获取文件或目录下载的 URL
+ */
+export function getFileDownloadUrl(path: string, directory?: string): string {
+  return buildUrl('/file/download', {
+    path,
+    directory: formatPathForApi(directory),
   })
 }
 

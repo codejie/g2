@@ -1,11 +1,12 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import { createSession, getSessions } from '../api/session'
+import { createSession, getSessions, updateSession, deleteSession, summarizeSession } from '../api/session'
 import { sendMessageAsync } from '../api/message'
 import { useServerStore } from './serverStore'
 import { useModelStore } from './modelStore'
 import { useMessageStore } from './messageStore'
 import type { ApiSession } from '../api/types'
+import i18n from '../i18n'
 
 export const useChatStore = defineStore('chat', () => {
   const serverStore = useServerStore()
@@ -18,6 +19,22 @@ export const useChatStore = defineStore('chat', () => {
   const loading = ref(false)
   const listLoading = ref(false)
   const sending = ref(false)
+  const isSidebarCollapsed = ref(false)
+  const isRightSidebarCollapsed = ref(false)
+  const rightSidebarWidth = ref(320)
+  const currentMode = ref<'build' | 'plan'>('build')
+
+  const toggleSidebar = () => {
+    isSidebarCollapsed.value = !isSidebarCollapsed.value
+  }
+
+  const toggleRightSidebar = () => {
+    isRightSidebarCollapsed.value = !isRightSidebarCollapsed.value
+  }
+
+  const setRightSidebarWidth = (width: number) => {
+    rightSidebarWidth.value = Math.max(200, Math.min(width, 800))
+  }
 
   // 获取 Session 列表并尝试恢复当前 Session
   const fetchSessions = async () => {
@@ -54,7 +71,8 @@ export const useChatStore = defineStore('chat', () => {
     try {
       console.log('[ChatStore] Creating new session...')
       const session = await createSession({
-        directory: serverStore.workspace
+        directory: serverStore.workspace,
+        title: i18n.t('sidebar.newChat')
       })
       console.log('[ChatStore] Session created:', session)
 
@@ -105,8 +123,28 @@ export const useChatStore = defineStore('chat', () => {
           providerID: modelStore.selectedModel.providerId,
           modelID: modelStore.selectedModel.id
         },
+        agent: currentMode.value,
         directory: serverStore.workspace
       })
+
+      // 自动生成标题逻辑
+      const isDefaultTitle =
+        !currentSession.value?.title ||
+        currentSession.value.title === i18n.t('sidebar.newChat') ||
+        currentSession.value.title === currentSession.value.id
+
+      if (isDefaultTitle) {
+        console.log('[ChatStore] Triggering AI summary for title...')
+        summarizeSession(currentSession.value.id, {
+          providerID: modelStore.selectedModel.providerId,
+          modelID: modelStore.selectedModel.id,
+          auto: true
+        }, serverStore.workspace).then(() => {
+          fetchSessions()
+        }).catch(err => {
+          console.error('[ChatStore] Failed to summarize session:', err)
+        })
+      }
     } catch (error) {
       console.error('[ChatStore] Failed to send prompt:', error)
       throw error
@@ -122,6 +160,39 @@ export const useChatStore = defineStore('chat', () => {
     messageStore.clearMessages()
   }
 
+  const updateSessionTitle = async (sessionId: string, title: string) => {
+    try {
+      await updateSession(sessionId, { title }, serverStore.workspace)
+      // 更新列表中的标题
+      const session = sessionList.value.find(s => s.id === sessionId)
+      if (session) {
+        session.title = title
+      }
+      // 如果是当前会话，更新当前会话标题
+      if (currentSession.value?.id === sessionId) {
+        currentSession.value.title = title
+      }
+    } catch (error) {
+      console.error('[ChatStore] Failed to update session title:', error)
+      throw error
+    }
+  }
+
+  const handleDeleteSession = async (sessionId: string) => {
+    try {
+      await deleteSession(sessionId, serverStore.workspace)
+      // 从列表中移除
+      sessionList.value = sessionList.value.filter(s => s.id !== sessionId)
+      // 如果是当前会话，重置
+      if (currentSession.value?.id === sessionId) {
+        resetSession()
+      }
+    } catch (error) {
+      console.error('[ChatStore] Failed to delete session:', error)
+      throw error
+    }
+  }
+
   return {
     hasSession,
     currentSession,
@@ -133,6 +204,15 @@ export const useChatStore = defineStore('chat', () => {
     startNewSession,
     selectSession,
     sendPrompt,
-    resetSession
+    resetSession,
+    updateSessionTitle,
+    handleDeleteSession,
+    isSidebarCollapsed,
+    isRightSidebarCollapsed,
+    rightSidebarWidth,
+    toggleSidebar,
+    toggleRightSidebar,
+    setRightSidebarWidth,
+    currentMode
   }
 })
