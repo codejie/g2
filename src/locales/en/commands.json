@@ -103,5 +103,9 @@
     "zoomOut": "Zoom out",
     "zoomReset": "Reset (double-click / double-tap)",
     "zoomIn": "Zoom in"
+  },
+  "skills":
+  {
+    "execute": "Execute"
   }
 }

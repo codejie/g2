@@ -1,11 +1,12 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { createSession, getSessions, updateSession, deleteSession, summarizeSession } from '../api/session'
+import { getSkills } from '../api/skill'
 import { sendMessageAsync } from '../api/message'
 import { useServerStore } from './serverStore'
 import { useModelStore } from './modelStore'
 import { useMessageStore } from './messageStore'
-import type { ApiSession } from '../api/types'
+import type { ApiSession, Skill } from '../api/types'
 import i18n from '../i18n'
 
 export const useChatStore = defineStore('chat', () => {
@@ -16,6 +17,7 @@ export const useChatStore = defineStore('chat', () => {
   const hasSession = ref(false)
   const currentSession = ref<ApiSession | null>(null)
   const sessionList = ref<ApiSession[]>([])
+  const skills = ref<Skill[]>([])
   const loading = ref(false)
   const listLoading = ref(false)
   const sending = ref(false)
@@ -34,6 +36,14 @@ export const useChatStore = defineStore('chat', () => {
 
   const setRightSidebarWidth = (width: number) => {
     rightSidebarWidth.value = Math.max(200, Math.min(width, 800))
+  }
+
+  const fetchSkills = async () => {
+    try {
+      skills.value = await getSkills(serverStore.workspace)
+    } catch (error) {
+      console.error('[ChatStore] Failed to fetch skills:', error)
+    }
   }
 
   // 获取 Session 列表并尝试恢复当前 Session
@@ -213,6 +223,8 @@ export const useChatStore = defineStore('chat', () => {
     toggleSidebar,
     toggleRightSidebar,
     setRightSidebarWidth,
+    skills,
+    fetchSkills,
     currentMode
   }
 })

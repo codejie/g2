@@ -30,6 +30,30 @@
         ></textarea>
 
         <!-- Bottom Controls -->
+        <div class="absolute bottom-3 left-3 flex items-center gap-2">
+          <!-- Skills Selector -->
+          <div class="flex items-center rounded-xl bg-bg-100 p-1 border border-border-100 hover:bg-bg-200 transition-colors cursor-pointer group/skill">
+            <el-dropdown @command="handleSkillSelect" trigger="click" popper-class="skill-dropdown">
+              <div class="flex items-center gap-2 px-2 py-1 outline-none">
+                <Package :size="14" class="text-text-400 group-hover/skill:text-accent-brand transition-colors" />
+                <span class="text-[10px] font-bold text-text-300 uppercase tracking-tight">Skills</span>
+                <ChevronDown :size="12" class="text-text-400" />
+              </div>
+              <template #dropdown>
+                <el-dropdown-menu class="skill-dropdown-menu max-h-80 overflow-y-auto custom-scrollbar">
+                  <el-dropdown-item v-for="skill in chatStore.skills" :key="skill.name" :command="skill.name">
+                    <div class="flex flex-col py-0.5 w-full">
+                      <span class="font-bold text-xs">{{ skill.name }}</span>
+                      <span v-if="skill.description" class="text-[10px] text-text-400 leading-snug line-clamp-2 mt-0.5 whitespace-normal">{{ skill.description }}</span>
+                    </div>
+                  </el-dropdown-item>
+                  <el-dropdown-item v-if="!chatStore.skills.length" disabled>No skills available</el-dropdown-item>
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
+          </div>
+        </div>
+
         <div class="absolute bottom-3 right-3 flex items-center gap-2">
           <!-- Mode Selector -->
           <div class="flex items-center rounded-xl bg-bg-100 p-1 border border-border-100 hover:bg-bg-200 transition-colors cursor-pointer group/mode">
@@ -82,8 +106,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import { Zap, ChevronDown, ArrowUp, Loader2, Brain } from 'lucide-vue-next'
+import { ref, computed, onMounted } from 'vue'
+import { Zap, ChevronDown, ArrowUp, Loader2, Brain, Package } from 'lucide-vue-next'
 import { useChatStore } from '../store/chatStore'
 import { useMessageStore } from '../store/messageStore'
 import i18n from '../i18n'
@@ -98,6 +122,10 @@ const chatStore = useChatStore()
 const messageStore = useMessageStore()
 const inputMessage = ref('')
 const textareaRef = ref<HTMLTextAreaElement | null>(null)
+
+onMounted(() => {
+  chatStore.fetchSkills()
+})
 
 interface QuickAction {
   id: string
@@ -119,7 +147,14 @@ const handleQuickAction = (action: QuickAction) => {
   textareaRef.value?.focus()
 }
 
-const handleModeChange = (mode: 'BUILD' | 'PLAN') => {
+const handleSkillSelect = (skillName: string) => {
+  const t = i18n.t('execute_skills')
+  const text = `${t} ${skillName} `
+  inputMessage.value = text + inputMessage.value
+  textareaRef.value?.focus()
+}
+
+const handleModeChange = (mode: 'build' | 'plan') => {
   chatStore.currentMode = mode
 }
 
@@ -158,6 +193,16 @@ const handleSend = async () => {
   font-size: 12px !important;
 }
 
+:deep(.skill-dropdown-menu) {
+  width: 110px !important;
+  padding: 2px !important;
+}
+
+:deep(.skill-dropdown-menu .el-dropdown-menu__item) {
+  padding: 4px 10px !important;
+  margin: 0 !important;
+}
+
 :deep(.el-dropdown-menu__item:hover) {
   background-color: var(--bg-100) !important;
   color: var(--accent-brand) !important;
@@ -166,5 +211,18 @@ const handleSend = async () => {
 :deep(.el-dropdown-menu__item.is-active) {
   background-color: var(--accent-brand-light) !important;
   color: var(--accent-brand) !important;
+}
+</style>
+
+<style>
+/* 全局样式，用于处理 el-dropdown 挂载到 body 后的宽度 */
+.skill-dropdown-menu {
+  width: 320px !important;
+  min-width: 320px !important;
+  max-width: 320px !important;
+}
+.skill-dropdown-menu .el-dropdown-menu__item {
+  padding: 4px 10px !important;
+  margin: 0 !important;
 }
 </style>

@@ -103,5 +103,8 @@
     "zoomOut": "缩小",
     "zoomReset": "重置（双击）",
     "zoomIn": "放大"
+  },
+  "skills": {
+    "execute": "执行"
   }
 }

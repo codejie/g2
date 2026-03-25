@@ -77,6 +77,9 @@ export type {
   Symbol as SymbolInfo,
 } from '../types/api/file'
 
+// Skill types
+export type { Skill, SkillList } from '../types/api/skill'
+
 // Agent types - with aliases
 export type { Agent as ApiAgent, AgentPermission as ApiAgentPermission } from '../types/api/agent'
 

@@ -67,6 +67,7 @@
   "enterRun": "↵ 执行",
   "enterConfirmShort": "↵ 确认",
   "escCancel": "Esc 取消",
+  "execute_skills": "执行",  
   "sidebar": {
     "newChat": "新会话",
     "creating": "正在创建...",

@@ -67,6 +67,7 @@
   "enterRun": "↵ run",
   "enterConfirmShort": "↵ confirm",
   "escCancel": "esc cancel",
+  "execute_skills": "Execute",
   "sidebar": {
     "newChat": "New Chat",
     "creating": "Creating...",
