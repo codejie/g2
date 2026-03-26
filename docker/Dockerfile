@@ -23,14 +23,23 @@ COPY . .
 RUN npm run build
 
 # ---- Stage 2: Runtime ----
-FROM node:22-alpine
+FROM ubuntu:24.04
 
-RUN apk add --no-cache curl
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    ca-certificates \
+    nodejs \
+    npm \
+    && rm -rf /var/lib/apt/lists/*
 
 RUN curl -fsSL https://opencode.ai/install | bash && \
     OPENCODE_BIN=$(find /root -name opencode -type f 2>/dev/null | head -1) && \
     cp "$OPENCODE_BIN" /usr/local/bin/opencode && \
     chmod +x /usr/local/bin/opencode
+
+RUN npm install -g vite
 
 ENV OPENCODE_CONFIG=/config/opencode.json
 
@@ -47,6 +56,6 @@ EXPOSE 3000 4096
 
 WORKDIR /srv/g2
 
-CMD sh -c 'opencode serve --port 4096 --hostname 0.0.0.0 & \
-    npm install -g vite && vite preview --port 3000 --host 0.0.0.0 & \
+CMD bash -c 'opencode serve --port 4096 --hostname 0.0.0.0 & \
+    vite preview --port 3000 --host 0.0.0.0 & \
     wait'
