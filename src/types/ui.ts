@@ -21,11 +21,28 @@ export interface UIMessage {
 }
 
 // ============================================
-// Attachment Types - 从现有组件导出
+// Attachment Types
 // ============================================
 
-// 直接从 features/attachment 导出，保持向后兼容
-export type { Attachment, AttachmentType } from '../features/attachment/types'
+export interface Attachment {
+  id: string
+  name: string
+  type: string
+  size: number
+  data?: unknown
+  displayName?: string
+  mime?: string
+  url?: string
+  relativePath?: string
+  agentName?: string
+  textRange?: {
+    value: string
+    start: number
+    end: number
+  }
+}
+
+export type AttachmentType = 'file' | 'image' | 'audio' | 'video'
 
 // ============================================
 // Model Types
@@ -85,8 +102,6 @@ export type ThemeMode = 'light' | 'dark' | 'system'
 // ============================================
 // Revert Types
 // ============================================
-
-import type { Attachment } from '../features/attachment/types'
 
 /**
  * 撤销历史项

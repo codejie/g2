@@ -1,4 +1,6 @@
-import { MS_PER_MINUTE, MS_PER_HOUR, MS_PER_DAY } from '../constants'
+export const MS_PER_MINUTE = 60 * 1000
+export const MS_PER_HOUR = 60 * MS_PER_MINUTE
+export const MS_PER_DAY = 24 * MS_PER_HOUR
 
 export function formatRelativeTime(timestamp: number): string {
   if (!timestamp) return ''

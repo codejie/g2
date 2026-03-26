@@ -1,9 +1,7 @@
 // ============================================
 // 文件下载工具函数
-// 支持从 URL 下载、从 Blob 下载，以及 Tauri 环境的原生保存（如果已安装相关插件）
+// 支持从 URL 下载、从 Blob 下载
 // ============================================
-
-import { isTauri } from './tauri'
 
 /**
  * 触发浏览器下载（仅浏览器环境）
@@ -25,24 +23,9 @@ export function triggerBrowserDownload(blob: Blob, fileName: string): void {
 }
 
 /**
- * Tauri 原生保存文件
- */
-async function tauriSaveFile(data: Uint8Array, fileName: string): Promise<void> {
-  try {
-    // 动态检测 Tauri 插件是否存在，避免在普通浏览器环境下引起 Vite 导入错误
-    // 这里的导入路径只是示例，实际取决于 package.json 中是否安装了这些依赖
-    // 在 g2 当前项目中由于没有安装这些依赖，所以这个分支暂时不可用
-    console.warn('[DownloadUtils] Tauri file system plugins not installed. Falling back to browser download.')
-  } catch (err) {
-    console.error('[DownloadUtils] Tauri save failed:', err)
-  }
-}
-
-/**
  * 通用保存：接受原始数据 + 文件名 + MIME 类型
  */
 export function saveData(data: Uint8Array, fileName: string, mimeType = 'application/octet-stream'): void {
-  // 目前强制使用浏览器下载，因为 package.json 中没有 tauri 插件
   const blob = new Blob([data.buffer as ArrayBuffer], { type: mimeType })
   triggerBrowserDownload(blob, fileName)
 }

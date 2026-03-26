@@ -13,12 +13,21 @@ async function initHighlighter() {
   }
 }
 
-const md = new MarkdownIt({
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;')
+}
+
+const md: MarkdownIt = new MarkdownIt({
   html: true,
   linkify: true,
   typographer: true,
   breaks: false,
-  highlight: (str, lang) => {
+  highlight: (str: string, lang: string): string => {
     const l = normalizeLanguage(lang)
     if (highlighter) {
       if (highlighter.getLoadedLanguages().includes(l)) {
@@ -34,7 +43,7 @@ const md = new MarkdownIt({
         highlighter.loadLanguage(l).catch(() => {})
       }
     }
-    return `<pre class="shiki" data-lang="${l}"><code>${md.utils.escapeHtml(str)}</code></pre>`
+    return `<pre class="shiki" data-lang="${l}"><code>${escapeHtml(str)}</code></pre>`
   }
 })
 

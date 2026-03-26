@@ -135,7 +135,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref } from 'vue'
 import {
   Box,
   MessageSquare,
@@ -153,16 +153,11 @@ import type { ApiSession } from '../api/types'
 import { ElMessageBox, ElMessage } from 'element-plus'
 import i18n from '../i18n'
 
-const isCollapsed = ref(false)
 const chatStore = useChatStore()
 
 const editingSessionId = ref<string | null>(null)
 const editTitle = ref('')
 const editInput = ref<HTMLInputElement | null>(null)
-
-const toggle = () => {
-  isCollapsed.value = !isCollapsed.value
-}
 
 const handleCreateProject = async () => {
   try {

@@ -63,7 +63,9 @@ export function extractUserMessageContent(apiMessage: ApiMessageWithParts): Reve
       const isFolder = fp.mime === 'application/x-directory'
       attachments.push({
         id: fp.id || crypto.randomUUID(),
+        name: fp.filename || fp.source?.path || 'file',
         type: isFolder ? 'folder' : 'file',
+        size: 0,
         displayName: fp.filename || fp.source?.path || 'file',
         url: fp.url,
         mime: fp.mime,
@@ -80,7 +82,9 @@ export function extractUserMessageContent(apiMessage: ApiMessageWithParts): Reve
       const ap = part as ApiAgentPart
       attachments.push({
         id: ap.id || crypto.randomUUID(),
+        name: ap.name,
         type: 'agent',
+        size: 0,
         displayName: ap.name,
         agentName: ap.name,
         textRange: ap.source

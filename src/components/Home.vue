@@ -30,12 +30,12 @@
           <div v-else class="max-w-3xl mx-auto w-full pt-8 space-y-8 pb-40">
             <div
               v-for="msg in messageStore.messages"
-              :key="msg.info?.id || msg.id"
+              :key="msg.info?.id"
               class="flex gap-4 animate-in fade-in slide-in-from-bottom-2 duration-300"
             >
               <div class="w-8 h-8 rounded-full shrink-0 flex items-center justify-center text-white"
-                   :class="(msg.role === 'user' || msg.info?.role === 'user') ? 'bg-bg-300 text-text-200' : 'bg-accent-brand'">
-                <User v-if="msg.role === 'user' || msg.info?.role === 'user'" :size="16" />
+                   :class="msg.info?.role === 'user' ? 'bg-bg-300 text-text-200' : 'bg-accent-brand'">
+                <User v-if="msg.info?.role === 'user'" :size="16" />
                 <Sparkles v-else :size="18" />
               </div>
 

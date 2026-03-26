@@ -65,7 +65,6 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
 import { Globe, Folder, Languages } from 'lucide-vue-next'
-import { useServerStore } from '../store/serverStore'
 import { ElMessage } from 'element-plus'
 import i18n from '../i18n'
 
@@ -77,7 +76,6 @@ const emit = defineEmits<{
   (e: 'update:modelValue', value: boolean): void
 }>()
 
-const serverStore = useServerStore()
 const visible = ref(props.modelValue)
 const saving = ref(false)
 

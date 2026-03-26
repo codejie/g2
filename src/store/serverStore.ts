@@ -108,4 +108,5 @@ export const useServerStore = defineStore('server', () => {
 export const serverStore = {
   getActiveServerId: () => useServerStore().getActiveServerId(),
   getActiveBaseUrl: () => useServerStore().getActiveBaseUrl(),
+  getActiveAuth: () => ({ username: '', password: '' }),
 }

@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { ref, watch } from 'vue'
+import { ref } from 'vue'
 import { getActiveModels } from '../api/client'
 import type { ModelInfo } from '../types/ui'
 

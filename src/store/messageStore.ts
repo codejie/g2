@@ -27,30 +27,26 @@ export const useMessageStore = defineStore('message', () => {
    * 由 message.part.updated 事件触发
    */
   const updatePartType = (messageID: string, partID: string, type: string) => {
-    const messageIndex = messages.value.findIndex(m => (m.id === messageID || m.info?.id === messageID))
+    const messageIndex = messages.value.findIndex(m => (m.info?.id === messageID))
     if (messageIndex === -1) return
 
     const message = messages.value[messageIndex]
     const partIndex = message.parts.findIndex((p: any) => p.id === partID)
 
     if (partIndex === -1) {
-      // 预先创建 Part
       message.parts.push({
         id: partID,
         type: type,
         text: ''
       } as any)
     } else {
-      const part = message.parts[partIndex]
-      // 类型锁定：允许从 text 升级到 reasoning，但不允许降级
+      const part = message.parts[partIndex] as any
       if (part.type !== type) {
         if (part.type === 'text' && (type === 'reasoning' || type === 'thought' || type === 'thinking')) {
           console.log(`[STORE-TYPE] Part ${partID} 升级为推理类型: ${type}`)
           part.type = 'reasoning'
-          // 替换对象以触发 Vue 响应式
           message.parts[partIndex] = { ...part }
         } else if (type === 'text' && part.type === 'reasoning') {
-          // 拒绝降级
           console.warn(`[STORE-TYPE] 拒绝将推理 Part ${partID} 降级为 text`)
         } else {
           part.type = type
@@ -59,7 +55,6 @@ export const useMessageStore = defineStore('message', () => {
       }
     }
 
-    // 强制触发消息级更新
     message.parts = [...message.parts]
     messages.value[messageIndex] = { ...message }
   }
@@ -84,7 +79,7 @@ export const useMessageStore = defineStore('message', () => {
   const handlePartDelta = (payload: any) => {
     const { messageID, partID, field, delta } = payload
 
-    let messageIndex = messages.value.findIndex(m => (m.id === messageID || m.info?.id === messageID))
+    let messageIndex = messages.value.findIndex(m => (m.info?.id === messageID))
 
     if (messageIndex === -1) {
       const newMessage: ApiMessageWithParts = {
@@ -116,8 +111,9 @@ export const useMessageStore = defineStore('message', () => {
     const part = message.parts[partIndex]
 
     // 增量内容时的类型保护
-    if ((field === 'reasoning' || field === 'thought') && part.type !== 'reasoning') {
-      part.type = 'reasoning'
+    const p = part as any
+    if ((field === 'reasoning' || field === 'thought') && p.type !== 'reasoning') {
+      p.type = 'reasoning'
     }
 
     if (part.type === 'text' || part.type === 'reasoning') {

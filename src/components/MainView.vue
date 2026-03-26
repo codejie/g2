@@ -60,7 +60,7 @@
 </template>
 
 <script setup lang="ts">
-import { Menu, ChevronDown, Share2, Box } from 'lucide-vue-next'
+import { ChevronDown, Share2, Box } from 'lucide-vue-next'
 import { useModelStore } from '../store/modelStore'
 import { useChatStore } from '../store/chatStore'
 import { useEventStore } from '../store/eventStore'
