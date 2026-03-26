@@ -22,36 +22,32 @@
 
       <el-form-item :label="$t('settings.baseUrl')">
         <el-input
-          v-model="tempBaseUrl"
-          placeholder="e.g. http://127.0.0.1:4096"
-          clearable
+          :model-value="envBaseUrl"
+          disabled
         >
           <template #prefix>
             <Globe :size="14" />
           </template>
         </el-input>
-        <div class="text-[10px] text-text-400 mt-1 flex justify-between">
+        <!-- <div class="text-[10px] text-text-400 mt-1">
           <span>{{ $t('settings.envDefault') }}: {{ envBaseUrl }}</span>
-          <el-link type="primary" :underline="false" style="font-size: 10px" @click="tempBaseUrl = envBaseUrl">{{ $t('settings.reset') }}</el-link>
-        </div>
+        </div> -->
       </el-form-item>
 
       <el-divider />
 
       <el-form-item :label="$t('settings.workspace')">
         <el-input
-          v-model="tempWorkspace"
-          placeholder="e.g. ./workspace"
-          clearable
+          :model-value="envWorkspace"
+          disabled
         >
           <template #prefix>
             <Folder :size="14" />
           </template>
         </el-input>
-        <div class="text-[10px] text-text-400 mt-1 flex justify-between">
+        <!-- <div class="text-[10px] text-text-400 mt-1">
           <span>{{ $t('settings.envDefault') }}: {{ envWorkspace }}</span>
-          <el-link type="primary" :underline="false" style="font-size: 10px" @click="tempWorkspace = envWorkspace">{{ $t('settings.reset') }}</el-link>
-        </div>
+        </div> -->
       </el-form-item>
     </el-form>
 
@@ -85,8 +81,6 @@ const serverStore = useServerStore()
 const visible = ref(props.modelValue)
 const saving = ref(false)
 
-const tempBaseUrl = ref(serverStore.baseUrl)
-const tempWorkspace = ref(serverStore.workspace)
 const tempLanguage = ref(i18n.language)
 
 const envBaseUrl = import.meta.env.VITE_OPENCODE_BASE_URL
@@ -96,9 +90,6 @@ const envWorkspace = import.meta.env.VITE_WORKSPACE
 watch(() => props.modelValue, (val) => {
   visible.value = val
   if (val) {
-    // 每次打开同步最新值
-    tempBaseUrl.value = serverStore.baseUrl
-    tempWorkspace.value = serverStore.workspace
     tempLanguage.value = i18n.language
   }
 })
@@ -110,11 +101,6 @@ watch(visible, (val) => {
 const handleSave = async () => {
   saving.value = true
   try {
-    serverStore.setBaseUrl(tempBaseUrl.value)
-    // 等待工作区切换完成，因为它是异步调用 API 了
-    await serverStore.setWorkspace(tempWorkspace.value)
-
-    // 切换语言
     if (i18n.language !== tempLanguage.value) {
       await i18n.changeLanguage(tempLanguage.value)
     }

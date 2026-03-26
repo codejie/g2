@@ -13,7 +13,7 @@ export const useServerStore = defineStore('server', () => {
   const workspace = ref(
     localStorage.getItem('opencode_workspace') ||
     import.meta.env.VITE_WORKSPACE ||
-    './workspace'
+    '/workspace'
   )
 
   watch(baseUrl, (newUrl) => {
@@ -65,7 +65,7 @@ export const useServerStore = defineStore('server', () => {
 
       // 1. 如果本地已经有持久化的非默认工作区，先尝试设置给服务器
       const savedWorkspace = localStorage.getItem('opencode_workspace')
-      if (savedWorkspace && savedWorkspace !== './workspace') {
+      if (savedWorkspace && savedWorkspace !== '/workspace') {
         try {
           // 通过发送带 directory 的空配置更新来初始化该工作区
           await updateConfig({}, savedWorkspace)
@@ -77,10 +77,10 @@ export const useServerStore = defineStore('server', () => {
       }
 
       // 2. 同步服务器当前路径
-      const pathInfo = await getPath(workspace.value !== './workspace' ? workspace.value : undefined)
+      const pathInfo = await getPath(workspace.value !== '/workspace' ? workspace.value : undefined)
       if (pathInfo && pathInfo.directory) {
         // 如果本地是默认值，或者获取到了更准确的路径，则同步
-        if (workspace.value === './workspace' || !workspace.value) {
+        if (workspace.value === '/workspace' || !workspace.value) {
           workspace.value = pathInfo.directory
           localStorage.setItem('opencode_workspace', pathInfo.directory)
           console.log('[ServerStore] Workspace synced to server path:', pathInfo.directory)
