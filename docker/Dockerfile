@@ -12,27 +12,26 @@
 # ---- Stage 1: Build frontend ----
 FROM node:22-alpine AS builder
 
+RUN apk add --no-cache git
+
 ARG NPM_REGISTRY=https://registry.npmjs.org/
 
 WORKDIR /app
-COPY package.json package-lock.json ./
-RUN npm config set registry "${NPM_REGISTRY}" && \
+
+RUN git clone https://github.com/codejie/g2.git . && \
+    npm config set registry "${NPM_REGISTRY}" && \
     npm ci --ignore-scripts
 
-COPY . .
 RUN npm run build
 
 # ---- Stage 2: Runtime ----
-FROM ubuntu:24.04
-
-ENV DEBIAN_FRONTEND=noninteractive
+FROM docker.io/library/node:22-slim
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     ca-certificates \
-    nodejs \
-    npm \
-    && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/* \
+    && apt-get clean
 
 RUN curl -fsSL https://opencode.ai/install | bash && \
     OPENCODE_BIN=$(find /root -name opencode -type f 2>/dev/null | head -1) && \
@@ -49,6 +48,10 @@ ARG OPENCODE_CONFIG_PATH=./docker/opencode.json
 COPY ${OPENCODE_CONFIG_PATH} /config/opencode.json
 
 COPY --from=builder /app/dist /srv/g2
+COPY --from=builder /app/package.json /srv/g2/
+COPY --from=builder /app/package-lock.json /srv/g2/
+
+RUN cd /srv/g2 && npm install --omit=dev
 
 VOLUME /workspace
 
@@ -57,5 +60,5 @@ EXPOSE 3000 4096
 WORKDIR /srv/g2
 
 CMD bash -c 'opencode serve --port 4096 --hostname 0.0.0.0 & \
-    vite preview --port 3000 --host 0.0.0.0 & \
+    npm run preview -- --port 3000 --host 0.0.0.0 & \
     wait'
