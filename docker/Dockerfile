@@ -8,6 +8,9 @@
 #
 #   # With custom config:
 #   docker build -f docker/Dockerfile --build-arg OPENCODE_CONFIG_PATH=/path/to/config.json -t g2-app:latest .
+#
+#   # With CACHEBUST (invalidates git clone cache):
+#   docker build -f docker/Dockerfile --build-arg CACHEBUST=$(date +%s) -t g2-app:latest .
 
 # ---- Stage 1: Build frontend ----
 FROM node:22-alpine AS builder
@@ -15,6 +18,7 @@ FROM node:22-alpine AS builder
 RUN apk add --no-cache git
 
 ARG NPM_REGISTRY=https://registry.npmjs.org/
+ARG CACHEBUST=1
 
 WORKDIR /app
 

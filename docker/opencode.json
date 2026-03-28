@@ -1,44 +1,8 @@
 {
   "$schema": "https://opencode.ai/config.json",
   "autoupdate": false,
-  "workspace": "/workspace",
   "permission": {
     "*": "allow"
   },
-  "models": {
-    "default": "opencode/gpt-5.4",
-    "opencode/gpt-5.4": true,
-    "opencode/gpt-5.4-pro": true,
-    "opencode/gpt-5.4-mini": true,
-    "opencode/gpt-5.4-nano": true,
-    "opencode/gpt-5.3-codex": true,
-    "opencode/gpt-5.3-codex-spark": true,
-    "opencode/gpt-5.2": true,
-    "opencode/gpt-5.2-codex": true,
-    "opencode/gpt-5.1": true,
-    "opencode/gpt-5.1-codex": true,
-    "opencode/gpt-5.1-codex-max": true,
-    "opencode/gpt-5.1-codex-mini": true,
-    "opencode/gpt-5": true,
-    "opencode/gpt-5-codex": true,
-    "opencode/gpt-5-nano": true,
-    "opencode/claude-opus-4-6": true,
-    "opencode/claude-opus-4-5": true,
-    "opencode/claude-opus-4-1": true,
-    "opencode/claude-sonnet-4-6": true,
-    "opencode/claude-sonnet-4-5": true,
-    "opencode/claude-sonnet-4": true,
-    "opencode/claude-haiku-4-5": true,
-    "opencode/claude-3-5-haiku": true,
-    "opencode/gemini-3.1-pro": true,
-    "opencode/gemini-3-flash": true,
-    "opencode/minimax-m2.5": true,
-    "opencode/minimax-m2.5-free": true,
-    "opencode/glm-5": true,
-    "opencode/kimi-k2.5": true,
-    "opencode/big-pickle": true,
-    "opencode/mimo-v2-pro-free": true,
-    "opencode/mimo-v2-omni-free": true,
-    "opencode/nemotron-3-super-free": true
-  }
+  "provider": {}
 }
