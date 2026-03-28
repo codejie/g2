@@ -14,6 +14,22 @@ export const useServerStore = defineStore('server', () => {
   // Workspace 始终固定为配置文件中的值，不可修改
   const workspace = ref(CONFIG_WORKSPACE)
 
+  // 触发文件树刷新的计数器
+  const fileTreeRefreshKey = ref(0)
+
+  // 检查是否开启自动刷新文件树
+  const isAutoRefreshFileTree = () => {
+    return localStorage.getItem('g2_auto_refresh_file_tree') === 'true'
+  }
+
+  // 触发文件树刷新
+  const triggerFileTreeRefresh = () => {
+    if (isAutoRefreshFileTree()) {
+      fileTreeRefreshKey.value++
+      console.log('[ServerStore] Triggered file tree refresh, key:', fileTreeRefreshKey.value)
+    }
+  }
+
   watch(baseUrl, (newUrl) => {
     localStorage.setItem('opencode_base_url', newUrl)
   })
@@ -57,12 +73,15 @@ export const useServerStore = defineStore('server', () => {
   return {
     baseUrl,
     workspace,
+    fileTreeRefreshKey,
     setBaseUrl,
     setWorkspace,
     initializePaths,
     getActiveBaseUrl,
     getActiveWorkspace,
-    getActiveServerId
+    getActiveServerId,
+    triggerFileTreeRefresh,
+    isAutoRefreshFileTree
   }
 })
 

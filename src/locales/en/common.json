@@ -121,7 +121,9 @@
     "cancel": "Cancel",
     "save": "Save Settings",
     "success": "Settings saved and applied",
-    "error": "Failed to save settings"
+    "error": "Failed to save settings",
+    "autoRefreshFileTree": "Auto Refresh Workspace",
+    "autoRefreshFileTreeDesc": "Automatically refresh file tree after message completes"
   },
   "workspace": {
     "title": "Workspace"

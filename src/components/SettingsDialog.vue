@@ -49,6 +49,15 @@
           <span>{{ $t('settings.envDefault') }}: {{ envWorkspace }}</span>
         </div> -->
       </el-form-item>
+
+      <el-divider />
+
+      <el-form-item :label="$t('settings.autoRefreshFileTree')">
+        <el-switch v-model="tempAutoRefreshFileTree" />
+        <div class="mt-1 ml-2">
+          {{ $t('settings.autoRefreshFileTreeDesc') }}
+        </div>
+      </el-form-item>
     </el-form>
 
     <template #footer>
@@ -64,7 +73,7 @@
 
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import { Globe, Folder, Languages } from 'lucide-vue-next'
+import { Globe, Folder, Languages, RefreshCw } from 'lucide-vue-next'
 import { ElMessage } from 'element-plus'
 import i18n from '../i18n'
 
@@ -80,6 +89,7 @@ const visible = ref(props.modelValue)
 const saving = ref(false)
 
 const tempLanguage = ref(i18n.language)
+const tempAutoRefreshFileTree = ref(localStorage.getItem('g2_auto_refresh_file_tree') === 'true')
 
 const envBaseUrl = import.meta.env.VITE_OPENCODE_BASE_URL
 const envWorkspace = import.meta.env.VITE_WORKSPACE
@@ -89,6 +99,7 @@ watch(() => props.modelValue, (val) => {
   visible.value = val
   if (val) {
     tempLanguage.value = i18n.language
+    tempAutoRefreshFileTree.value = localStorage.getItem('g2_auto_refresh_file_tree') === 'true'
   }
 })
 
@@ -102,6 +113,8 @@ const handleSave = async () => {
     if (i18n.language !== tempLanguage.value) {
       await i18n.changeLanguage(tempLanguage.value)
     }
+
+    localStorage.setItem('g2_auto_refresh_file_tree', String(tempAutoRefreshFileTree.value))
 
     ElMessage.success({
       message: i18n.t('settings.success'),

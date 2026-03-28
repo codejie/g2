@@ -3,6 +3,12 @@
   "subtitle": "Customize UI, behavior, and server setup",
   "closeSettings": "Close settings",
   "version": "OpenCodeUI v{{version}}",
+  "cancel": "Cancel",
+  "save": "Save",
+  "success": "Settings saved",
+  "error": "Save failed",
+  "autoRefreshFileTree": "Auto Refresh Workspace",
+  "autoRefreshFileTreeDesc": "Automatically refresh file tree after message completes",
   "tabs": {
     "servers": "Servers",
     "serversDesc": "Backend connections and fast active endpoint switching",

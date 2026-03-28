@@ -121,7 +121,9 @@
     "cancel": "取消",
     "save": "保存设置",
     "success": "设置已保存并生效",
-    "error": "保存设置失败"
+    "error": "保存设置失败",
+    "autoRefreshFileTree": "开启自动工作区刷新",
+    "autoRefreshFileTreeDesc": "消息发送完成后自动刷新文件树"
   },
   "workspace": {
     "title": "工作区"

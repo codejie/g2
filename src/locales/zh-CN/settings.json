@@ -3,6 +3,12 @@
   "subtitle": "自定义界面、行为和服务器配置",
   "closeSettings": "关闭设置",
   "version": "OpenCodeUI v{{version}}",
+  "cancel": "取消",
+  "save": "保存",
+  "success": "设置已保存",
+  "error": "保存失败",
+  "autoRefreshFileTree": "开启自动工作区刷新",
+  "autoRefreshFileTreeDesc": "消息发送完成后自动刷新文件树",
   "tabs": {
     "servers": "服务器",
     "serversDesc": "后端连接和快速切换活跃端点",

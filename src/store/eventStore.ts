@@ -41,6 +41,10 @@ export const useEventStore = defineStore('event', () => {
       },
       onSessionStatus: (payload) => {
         console.log('[SSE] Session Status:', payload)
+        // 消息完成时触发文件树刷新 (idle 表示工作完成)
+        if (payload.status && typeof payload.status === 'object' && payload.status.type === 'idle') {
+          serverStore.triggerFileTreeRefresh()
+        }
       },
       onServerHeartbeat: () => {
         lastHeartbeatTime.value = Date.now()

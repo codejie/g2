@@ -24,6 +24,7 @@ declare module 'vue' {
     ElOption: typeof import('element-plus/es')['ElOption']
     ElSelect: typeof import('element-plus/es')['ElSelect']
     ElSkeleton: typeof import('element-plus/es')['ElSkeleton']
+    ElSwitch: typeof import('element-plus/es')['ElSwitch']
     FileBrowser: typeof import('./src/components/FileBrowser.vue')['default']
     FilePreviewPanel: typeof import('./src/components/FilePreviewPanel.vue')['default']
     FileTreeItem: typeof import('./src/components/FileTreeItem.vue')['default']

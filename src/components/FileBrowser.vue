@@ -76,5 +76,11 @@ const handleFileSelect = (node: FileNode) => {
 // 监听工作区变化自动刷新
 watch(() => serverStore.workspace, refresh)
 
+// 监听文件树刷新触发
+watch(() => serverStore.fileTreeRefreshKey, () => {
+  console.log('[FileBrowser] Refresh triggered by key change')
+  refresh()
+})
+
 onMounted(refresh)
 </script>

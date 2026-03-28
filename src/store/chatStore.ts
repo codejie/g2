@@ -21,6 +21,7 @@ export const useChatStore = defineStore('chat', () => {
   const loading = ref(false)
   const listLoading = ref(false)
   const sending = ref(false)
+  const pendingMessage = ref('')
   const isSidebarCollapsed = ref(false)
   const isRightSidebarCollapsed = ref(false)
   const rightSidebarWidth = ref(320)
@@ -79,15 +80,20 @@ export const useChatStore = defineStore('chat', () => {
   const startNewSession = async () => {
     loading.value = true
     try {
-      console.log('[ChatStore] Creating new session...')
       const session = await createSession({
         directory: serverStore.workspace,
         title: i18n.t('sidebar.newChat')
       })
-      console.log('[ChatStore] Session created:', session)
 
       messageStore.clearMessages()
-      selectSession(session)
+      await selectSession(session)
+
+      if (pendingMessage.value) {
+        const text = pendingMessage.value
+        pendingMessage.value = ''
+        messageStore.addUserMessage(text)
+        await sendPrompt(text)
+      }
 
       // 强制刷新列表
       await fetchSessions()
@@ -100,8 +106,7 @@ export const useChatStore = defineStore('chat', () => {
     }
   }
 
-  const selectSession = (session: ApiSession) => {
-    console.log('[ChatStore] Selecting session:', session.id)
+  const selectSession = async (session: ApiSession) => {
     currentSession.value = session
     hasSession.value = true
 
@@ -109,14 +114,16 @@ export const useChatStore = defineStore('chat', () => {
     localStorage.setItem('g2_current_session_id', session.id)
 
     // 加载消息
-    messageStore.loadMessages(session.id, serverStore.workspace)
+    await messageStore.loadMessages(session.id, serverStore.workspace)
   }
 
   const sendPrompt = async (text: string) => {
     if (!text.trim()) return
 
     if (!currentSession.value) {
+      pendingMessage.value = text
       await startNewSession()
+      return
     }
 
     if (!currentSession.value || !modelStore.selectedModel) {
@@ -225,6 +232,7 @@ export const useChatStore = defineStore('chat', () => {
     setRightSidebarWidth,
     skills,
     fetchSkills,
-    currentMode
+    currentMode,
+    pendingMessage
   }
 })

@@ -47,7 +47,7 @@
                       <span v-if="skill.description" class="text-[10px] text-text-400 leading-snug line-clamp-2 mt-0.5 whitespace-normal">{{ skill.description }}</span>
                     </div>
                   </el-dropdown-item>
-                  <el-dropdown-item v-if="!chatStore.skills.length" disabled>No skills available</el-dropdown-item>
+                  <el-dropdown-item v-if="!chatStore.skills.length" disabled>{{ $t('components:skillPanel.noSkills') }}</el-dropdown-item>
                 </el-dropdown-menu>
               </template>
             </el-dropdown>
@@ -162,8 +162,8 @@ const handleSend = async () => {
   const text = inputMessage.value.trim()
   if (!text || chatStore.sending) return
 
+  messageStore.addUserMessage(text)
   try {
-    messageStore.addUserMessage(text)
     inputMessage.value = ''
     await chatStore.sendPrompt(text)
   } catch (err) {
