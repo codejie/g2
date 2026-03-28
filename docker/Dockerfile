@@ -57,8 +57,8 @@ VOLUME /workspace
 
 EXPOSE 3000 4000
 
-WORKDIR /app
+WORKDIR /workspace
 
 CMD bash -c 'opencode serve --port 4000 --hostname 0.0.0.0 & \
-    vite --port 3000 --host 0.0.0.0 & \
+    vite /app --port 3000 --host 0.0.0.0 & \
     wait'
