@@ -47,18 +47,14 @@ RUN mkdir -p /config
 ARG OPENCODE_CONFIG_PATH=./docker/opencode.json
 COPY ${OPENCODE_CONFIG_PATH} /config/opencode.json
 
-COPY --from=builder /app/dist /srv/g2
-COPY --from=builder /app/package.json /srv/g2/
-COPY --from=builder /app/package-lock.json /srv/g2/
-
-RUN cd /srv/g2 && npm install --omit=dev
+COPY --from=builder /app/dist /app
 
 VOLUME /workspace
 
-EXPOSE 3000 4096
+EXPOSE 3000 4000
 
-WORKDIR /srv/g2
+WORKDIR /app
 
-CMD bash -c 'opencode serve --port 4096 --hostname 0.0.0.0 & \
-    npm run preview -- --port 3000 --host 0.0.0.0 & \
+CMD bash -c 'opencode serve --port 4000 --hostname 0.0.0.0 & \
+    vite --port 3000 --host 0.0.0.0 & \
     wait'
