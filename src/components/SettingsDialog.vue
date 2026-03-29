@@ -73,7 +73,7 @@
 
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import { Globe, Folder, Languages, RefreshCw } from 'lucide-vue-next'
+import { Globe, Folder, Languages } from 'lucide-vue-next'
 import { ElMessage } from 'element-plus'
 import i18n from '../i18n'
 

@@ -41,11 +41,8 @@
         class="flex-1 flex flex-col h-full animate-in fade-in duration-300"
         :style="{ minWidth: chatStore.rightSidebarWidth + 'px' }"
       >
-        <FileBrowser @select-file="selectedFilePath = $event" />
+        <FileBrowser />
       </div>
-
-      <!-- File Preview Panel -->
-      <FilePreviewPanel v-model="selectedFilePath" />
     </aside>
   </div>
 </template>
@@ -55,10 +52,8 @@ import { ref, onUnmounted } from 'vue'
 import { ChevronLeft, ChevronRight } from 'lucide-vue-next'
 import { useChatStore } from '../store/chatStore'
 import FileBrowser from './FileBrowser.vue'
-import FilePreviewPanel from './FilePreviewPanel.vue'
 
 const chatStore = useChatStore()
-const selectedFilePath = ref<string | null>(null)
 
 const isResizing = ref(false)
 

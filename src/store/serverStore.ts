@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, watch } from 'vue'
 
-const CONFIG_WORKSPACE = '/workspace'
+const CONFIG_WORKSPACE = import.meta.env.VITE_WORKSPACE || '/workspace'
 
 export const useServerStore = defineStore('server', () => {
   // Base URL 持久化

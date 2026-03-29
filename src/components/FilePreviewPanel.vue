@@ -38,7 +38,7 @@
 
         <div
           ref="scrollContainer"
-          class="h-full overflow-auto custom-scrollbar p-5 font-mono text-[13px] leading-relaxed selection:bg-accent-brand/20"
+          class="h-full overflow-auto custom-scrollbar p-5 font-mono text-[13px] leading-relaxed"
         >
           <div v-if="!loading" class="markdown-body" v-html="highlightedCode"></div>
         </div>
@@ -90,10 +90,8 @@ const fetchAndHighlight = async (path: string) => {
     const res = await getFileContent(path, serverStore.workspace)
     const lang = detectLanguage(path)
 
-    // Use the existing markdown renderer which is already integrated with Shiki
     highlightedCode.value = renderMarkdown(`\`\`\`${lang}\n${res.content}\n\`\`\``)
 
-    // Reset scroll position
     await nextTick()
     if (scrollContainer.value) {
       scrollContainer.value.scrollTop = 0

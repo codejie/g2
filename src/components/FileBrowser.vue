@@ -31,6 +31,8 @@
       </div>
     </div>
 
+    <FilePreviewPanel v-model="selectedFile" />
+
     <div class="px-4 py-3 border-t border-border-100 bg-bg-000">
       <div class="flex items-center gap-2 text-[10px] text-text-400 font-medium">
         <Monitor :size="12" class="opacity-70" />
@@ -47,11 +49,13 @@ import { listDirectory } from '../api/file'
 import { useServerStore } from '../store/serverStore'
 import type { FileNode } from '../api/types'
 import FileTreeItem from './FileTreeItem.vue'
+import FilePreviewPanel from './FilePreviewPanel.vue'
 
 const emit = defineEmits(['select-file'])
 const serverStore = useServerStore()
 const files = ref<FileNode[]>([])
 const loading = ref(false)
+const selectedFile = ref<string | null>(null)
 
 const refresh = async () => {
   if (!serverStore.workspace) return
@@ -69,7 +73,7 @@ const refresh = async () => {
 
 const handleFileSelect = (node: FileNode) => {
   if (node.type === 'file') {
-    emit('select-file', node.path)
+    selectedFile.value = node.path
   }
 }
 
