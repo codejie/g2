@@ -11,6 +11,7 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    AddProviderDialog: typeof import('./src/components/AddProviderDialog.vue')['default']
     ChatInput: typeof import('./src/components/ChatInput.vue')['default']
     ElButton: typeof import('element-plus/es')['ElButton']
     ElDialog: typeof import('element-plus/es')['ElDialog']
@@ -30,6 +31,7 @@ declare module 'vue' {
     FileTreeItem: typeof import('./src/components/FileTreeItem.vue')['default']
     Home: typeof import('./src/components/Home.vue')['default']
     MainView: typeof import('./src/components/MainView.vue')['default']
+    ModelFilterHeader: typeof import('./src/components/ModelFilterHeader.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     SettingsDialog: typeof import('./src/components/SettingsDialog.vue')['default']

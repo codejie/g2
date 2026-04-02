@@ -130,7 +130,8 @@
   },
   "models": {
     "loading": "Loading models...",
-    "noActive": "No active models"
+    "noActive": "No active models",
+    "noMatch": "No matching models found"
   },
   "file": {
     "downloadConfirm": "Are you sure you want to download \"{{name}}\"?",

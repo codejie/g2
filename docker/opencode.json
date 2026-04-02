@@ -5,5 +5,16 @@
   "permission": {
     "*": "allow"
   },
-  "provider": {}
+  "provider": {
+    "ollama": {
+      "name": "ollama-local",
+      "models":{
+        "qwen3:8b": {
+          "name": "qwen3:8b",
+          "tool_call": true,
+          "type": "openai"
+        }
+      } 
+    }
+  }
 }

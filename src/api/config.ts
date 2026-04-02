@@ -10,14 +10,30 @@ import type { Config } from '../types/api/config'
  * 获取当前配置
  */
 export async function getConfig(directory?: string): Promise<Config> {
-  return get<Config>('/config', { directory: formatPathForApi(directory) })
+  const params = directory ? { directory: formatPathForApi(directory) } : {}
+  return get<Config>('/config', params)
 }
 
 /**
  * 更新配置
  */
 export async function updateConfig(config: Partial<Config>, directory?: string): Promise<Config> {
-  return patch<Config>('/config', { directory: formatPathForApi(directory) }, config)
+  const params = directory ? { directory: formatPathForApi(directory) } : {}
+  return patch<Config>('/config', params, config)
+}
+
+/**
+ * 获取全局配置
+ */
+export async function getGlobalConfig(): Promise<Config> {
+  return get<Config>('/config')
+}
+
+/**
+ * 更新全局配置
+ */
+export async function updateGlobalConfig(config: Partial<Config>): Promise<Config> {
+  return patch<Config>('/config', {}, config)
 }
 
 /**

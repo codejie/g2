@@ -22,22 +22,31 @@
               </span>
               <ChevronDown :size="14" class="text-text-400" />
             </div>
-            <template #dropdown>
-              <el-dropdown-menu class="max-h-[400px] overflow-y-auto custom-scrollbar">
-                <el-dropdown-item v-for="m in modelStore.models" :key="m.id" :command="m" class="model-item">
-                  <div class="flex items-center justify-between py-0.5 gap-4">
-                    <div class="flex flex-col">
-                      <span>
-                        <span class="text-xs font-bold">{{ m.name }}</span>
-                        <span class="ml-4 text-[10px] text-text-400">{{ m.providerName }}</span>
-                      </span>
-                    </div>
-                    <span class="text-[10px] text-text-400 shrink-0">{{ formatContextLimit(m.contextLimit) }}</span>
-                  </div>
-                </el-dropdown-item>
-                <el-dropdown-item v-if="!modelStore.models.length" disabled>{{ $t('models.noActive') }}</el-dropdown-item>
-              </el-dropdown-menu>
-            </template>
+<template #dropdown>
+	<el-dropdown-menu class="max-h-[400px] overflow-y-auto custom-scrollbar">
+		<ModelFilterHeader v-model="modelSearchQuery" />
+		<el-dropdown-item
+			v-for="m in filteredModels"
+			:key="`${m.providerId}-${m.id}`"
+			:command="m"
+			class="model-item"
+		>
+			<div class="flex items-center justify-between py-0.5 gap-4">
+				<div class="flex flex-col">
+					<span>
+						<span class="text-xs font-bold">{{ m.name }}</span>
+						<span class="ml-4 text-[10px] text-text-400">{{ m.providerName }}</span>
+					</span>
+				</div>
+				<span class="text-[10px] text-text-400 shrink-0">{{ formatContextLimit(m.contextLimit) }}</span>
+			</div>
+		</el-dropdown-item>
+		<el-dropdown-item v-if="!filteredModels.length && modelStore.models.length" disabled>
+			{{ $t('models.noMatch') }}
+		</el-dropdown-item>
+		<el-dropdown-item v-if="!modelStore.models.length" disabled>{{ $t('models.noActive') }}</el-dropdown-item>
+	</el-dropdown-menu>
+</template>
           </el-dropdown>
         </div>
       </div>
@@ -60,29 +69,43 @@
 </template>
 
 <script setup lang="ts">
+import { ref, computed } from 'vue'
 import { ChevronDown, Share2, Box } from 'lucide-vue-next'
 import { useModelStore } from '../store/modelStore'
 import { useChatStore } from '../store/chatStore'
 import { useEventStore } from '../store/eventStore'
 import Home from './Home.vue'
+import ModelFilterHeader from './ModelFilterHeader.vue'
 import type { ModelInfo } from '../types/ui'
 
 const modelStore = useModelStore()
 const chatStore = useChatStore()
 const eventStore = useEventStore()
 
+const modelSearchQuery = ref('')
+
+const filteredModels = computed(() => {
+	const query = modelSearchQuery.value.toLowerCase().trim()
+	if (!query) return modelStore.models
+
+	return modelStore.models.filter(m => {
+		const searchStr = `${m.name} ${m.providerName}`.toLowerCase()
+		return searchStr.includes(query)
+	})
+})
+
 const handleModelChange = (model: ModelInfo) => {
-  modelStore.selectModel(model)
+	modelStore.selectModel(model)
 }
 
 const formatContextLimit = (limit: number): string => {
-  if (limit >= 1000000) {
-    return `${(limit / 1000000).toFixed(0)}M`
-  }
-  if (limit >= 1000) {
-    return `${(limit / 1000).toFixed(0)}k`
-  }
-  return limit.toString()
+	if (limit >= 1000000) {
+		return `${(limit / 1000000).toFixed(0)}M`
+	}
+	if (limit >= 1000) {
+		return `${(limit / 1000).toFixed(0)}k`
+	}
+	return limit.toString()
 }
 </script>
 

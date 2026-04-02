@@ -53,13 +53,13 @@
       >
         {{ $t('sidebar.noHistory') }}
       </div>
-      <div
-        v-for="session in chatStore.sessionList"
-        :key="session.id"
-        @click="handleSelectSession(session)"
-        class="group px-3 py-1.5 rounded-xl hover:bg-bg-100 cursor-pointer text-sm text-text-200 flex items-center gap-3 transition-colors"
-        :class="[chatStore.currentSession?.id === session.id ? 'bg-bg-100' : '']"
-      >
+<div
+	v-for="session in chatStore.sessionList"
+	:key="session.id"
+	@click="handleSelectSession(session)"
+	class="group relative px-3 py-1.5 rounded-xl hover:bg-bg-100 cursor-pointer text-sm text-text-200 flex items-center gap-3 transition-colors"
+	:class="[chatStore.currentSession?.id === session.id ? 'bg-bg-100' : '']"
+>
         <MessageSquare
           :size="16"
           class="shrink-0 transition-colors"
@@ -77,26 +77,26 @@
           />
         </template>
         <template v-else>
-          <div class="flex flex-col min-w-0 flex-1">
-            <span class="truncate text-sm font-medium text-text-100">{{ session.title || session.id }}</span>
-            <span class="text-[10px] text-text-400 mt-0.5">{{ formatDate(session.time.created) }}</span>
-          </div>
-          <div class="invisible group-hover:visible flex items-center gap-1 shrink-0">
-            <button
-              @click.stop="handleStartEdit(session)"
-              class="p-1 hover:bg-bg-200 rounded text-text-400 hover:text-accent-brand transition-colors"
-              :title="$t('sidebar.rename')"
-            >
-              <Pencil :size="14" />
-            </button>
-            <button
-              @click.stop="handleDeleteSession(session.id)"
-              class="p-1 hover:bg-danger-100/10 rounded text-text-400 hover:text-danger-100 transition-colors"
-              :title="$t('sidebar.delete')"
-            >
-              <Trash2 :size="14" />
-            </button>
-          </div>
+	<div class="flex flex-col min-w-0 flex-1">
+		<span class="truncate text-xs font-bold text-text-100">{{ session.title || session.id }}</span>
+		<span class="text-[10px] text-text-400 mt-0.5">{{ formatDate(session.time.created) }}</span>
+	</div>
+	<div class="absolute right-3 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 flex items-center gap-1 px-1 rounded transition-opacity">
+		<button
+			@click.stop="handleStartEdit(session)"
+			class="p-1 hover:bg-bg-200 rounded text-text-400 hover:text-accent-brand transition-colors"
+			:title="$t('sidebar.rename')"
+		>
+			<Pencil :size="14" />
+		</button>
+		<button
+			@click.stop="handleDeleteSession(session.id)"
+			class="p-1 hover:bg-danger-100/10 rounded text-text-400 hover:text-danger-100 transition-colors"
+			:title="$t('sidebar.delete')"
+		>
+			<Trash2 :size="14" />
+		</button>
+	</div>
         </template>
       </div>
     </div>

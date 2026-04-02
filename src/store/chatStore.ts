@@ -117,14 +117,36 @@ export const useChatStore = defineStore('chat', () => {
     await messageStore.loadMessages(session.id, serverStore.workspace)
   }
 
-  const sendPrompt = async (text: string) => {
-    if (!text.trim()) return
+	const generateFallbackTitle = (text: string): string => {
+		const maxChars = 32
+		const maxChinese = 12
+		let result = ''
+		let chineseCount = 0
+		let charCount = 0
+		
+		for (const char of text) {
+			if (char === '\n') break
+			if (/[\u4e00-\u9fa5]/.test(char)) {
+				chineseCount++
+				if (chineseCount > maxChinese) break
+			} else {
+				charCount++
+				if (charCount > maxChars) break
+			}
+			result += char
+		}
+		
+		return result.trim() || text.substring(0, maxChars)
+	}
 
-    if (!currentSession.value) {
-      pendingMessage.value = text
-      await startNewSession()
-      return
-    }
+	const sendPrompt = async (text: string) => {
+		if (!text.trim()) return
+
+		if (!currentSession.value) {
+			pendingMessage.value = text
+			await startNewSession()
+			return
+		}
 
     if (!currentSession.value || !modelStore.selectedModel) {
       throw new Error('No active session or model selected')
@@ -150,18 +172,20 @@ export const useChatStore = defineStore('chat', () => {
         currentSession.value.title === i18n.t('sidebar.newChat') ||
         currentSession.value.title === currentSession.value.id
 
-      if (isDefaultTitle) {
-        console.log('[ChatStore] Triggering AI summary for title...')
-        summarizeSession(currentSession.value.id, {
-          providerID: modelStore.selectedModel.providerId,
-          modelID: modelStore.selectedModel.id,
-          auto: true
-        }, serverStore.workspace).then(() => {
-          fetchSessions()
-        }).catch(err => {
-          console.error('[ChatStore] Failed to summarize session:', err)
-        })
-      }
+	if (isDefaultTitle) {
+		console.log('[ChatStore] Triggering AI summary for title...')
+		summarizeSession(currentSession.value.id, {
+			providerID: modelStore.selectedModel.providerId,
+			modelID: modelStore.selectedModel.id,
+			auto: true
+		}, serverStore.workspace).then(() => {
+			fetchSessions()
+		}).catch(async err => {
+			console.error('[ChatStore] Failed to summarize session:', err)
+			const fallbackTitle = generateFallbackTitle(text)
+			await updateSessionTitle(currentSession.value!.id, fallbackTitle)
+		})
+	}
     } catch (error) {
       console.error('[ChatStore] Failed to send prompt:', error)
       throw error
