@@ -6,6 +6,8 @@ import { get, patch } from './http'
 import { formatPathForApi } from '../utils/directoryUtils'
 import type { Config } from '../types/api/config'
 
+const GLOBAL_CONFIG_DIR = '/root/.config/opencode'
+
 /**
  * 获取当前配置
  */
@@ -26,14 +28,18 @@ export async function updateConfig(config: Partial<Config>, directory?: string):
  * 获取全局配置
  */
 export async function getGlobalConfig(): Promise<Config> {
-  return get<Config>('/config')
+  return get<Config>('/config', { directory: GLOBAL_CONFIG_DIR })
 }
 
 /**
  * 更新全局配置
  */
 export async function updateGlobalConfig(config: Partial<Config>): Promise<Config> {
-  return patch<Config>('/config', {}, config)
+  console.log('[updateGlobalConfig] directory:', GLOBAL_CONFIG_DIR)
+  console.log('[updateGlobalConfig] config:', JSON.stringify(config, null, 2))
+  const result = await patch<Config>('/config', { directory: GLOBAL_CONFIG_DIR }, config)
+  console.log('[updateGlobalConfig] result:', JSON.stringify(result, null, 2))
+  return result
 }
 
 /**

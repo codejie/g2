@@ -131,7 +131,12 @@
   "models": {
     "loading": "正在加载模型...",
     "noActive": "暂无可用模型",
-    "noMatch": "未找到匹配的模型"
+    "noMatch": "未找到匹配的模型",
+    "delete": "删除模型",
+    "deleteTitle": "删除模型",
+    "deleteConfirm": "确定要删除模型「{name}」（供应商：{provider}）吗？",
+    "deleteSuccess": "模型删除成功",
+    "deleteFailed": "模型删除失败"
   },
   "file": {
     "downloadConfirm": "确定要下载 \"{{name}}\" 吗？",

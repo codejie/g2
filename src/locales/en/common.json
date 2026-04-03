@@ -131,7 +131,12 @@
   "models": {
     "loading": "Loading models...",
     "noActive": "No active models",
-    "noMatch": "No matching models found"
+    "noMatch": "No matching models found",
+    "delete": "Delete Model",
+    "deleteTitle": "Delete Model",
+    "deleteConfirm": "Are you sure you want to delete model \"{name}\" (Provider: {provider})?",
+    "deleteSuccess": "Model deleted successfully",
+    "deleteFailed": "Failed to delete model"
   },
   "file": {
     "downloadConfirm": "Are you sure you want to download \"{{name}}\"?",

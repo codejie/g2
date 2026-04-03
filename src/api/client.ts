@@ -37,9 +37,11 @@ export * from './lsp'
 // 基于 OpenAPI: GET /config/providers
 // ============================================
 
+const GLOBAL_CONFIG_DIR = '/root/.config/opencode'
+
 export async function getActiveModels(directory?: string): Promise<ModelInfo[]> {
   const data = await get<ProvidersResponse>('/config/providers', {
-    directory: formatPathForApi(directory),
+    directory: directory ? formatPathForApi(directory) : GLOBAL_CONFIG_DIR,
   })
   const models: ModelInfo[] = []
 

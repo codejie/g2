@@ -31,14 +31,23 @@
 			:command="m"
 			class="model-item"
 		>
-			<div class="flex items-center justify-between py-0.5 gap-4">
+			<div class="flex items-center justify-between py-0.5 gap-4 w-full">
 				<div class="flex flex-col">
 					<span>
 						<span class="text-xs font-bold">{{ m.name }}</span>
 						<span class="ml-4 text-[10px] text-text-400">{{ m.providerName }}</span>
 					</span>
 				</div>
-				<span class="text-[10px] text-text-400 shrink-0">{{ formatContextLimit(m.contextLimit) }}</span>
+				<div class="flex items-center gap-2">
+					<span class="text-[10px] text-text-400 shrink-0">{{ formatContextLimit(m.contextLimit) }}</span>
+					<button
+						@click.stop.prevent="handleDeleteModel(m)"
+						class="opacity-0 hover:opacity-100 p-1 hover:bg-danger-100/10 rounded text-text-400 hover:text-danger-100 transition-opacity"
+						:title="$t('models.delete')"
+					>
+						<Minus :size="12" />
+					</button>
+				</div>
 			</div>
 		</el-dropdown-item>
 		<el-dropdown-item v-if="!filteredModels.length && modelStore.models.length" disabled>
@@ -70,13 +79,16 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { ChevronDown, Share2, Box } from 'lucide-vue-next'
+import { ChevronDown, Share2, Box, Minus } from 'lucide-vue-next'
+import { ElMessageBox, ElMessage } from 'element-plus'
 import { useModelStore } from '../store/modelStore'
 import { useChatStore } from '../store/chatStore'
 import { useEventStore } from '../store/eventStore'
+import { getGlobalConfig, updateGlobalConfig } from '../api/config'
 import Home from './Home.vue'
 import ModelFilterHeader from './ModelFilterHeader.vue'
 import type { ModelInfo } from '../types/ui'
+import i18n from '../i18n'
 
 const modelStore = useModelStore()
 const chatStore = useChatStore()
@@ -96,6 +108,64 @@ const filteredModels = computed(() => {
 
 const handleModelChange = (model: ModelInfo) => {
 	modelStore.selectModel(model)
+}
+
+const handleDeleteModel = async (model: ModelInfo) => {
+  try {
+    await ElMessageBox.confirm(
+      i18n.t('models.deleteConfirm', { name: model.name, provider: model.providerName }),
+      i18n.t('models.deleteTitle'),
+      {
+        confirmButtonText: i18n.t('delete'),
+        cancelButtonText: i18n.t('cancel'),
+        type: 'warning'
+      }
+    )
+
+    const currentConfig = await getGlobalConfig()
+    console.log('[DeleteModel] Current config:', JSON.stringify(currentConfig, null, 2))
+    console.log('[DeleteModel] Model to delete:', model.providerId, model.id)
+
+    if (!currentConfig.provider) {
+      console.log('[DeleteModel] No provider in config')
+      ElMessage.error(i18n.t('models.deleteFailed'))
+      return
+    }
+
+    const providerConfig = (currentConfig.provider as Record<string, unknown>)[model.providerId] as { models?: Record<string, unknown> } | undefined
+    console.log('[DeleteModel] Provider config:', providerConfig)
+    
+    if (!providerConfig?.models) {
+      console.log('[DeleteModel] No models in provider config')
+      ElMessage.error(i18n.t('models.deleteFailed'))
+      return
+    }
+
+    console.log('[DeleteModel] Models before delete:', providerConfig.models)
+    if (!providerConfig.models[model.id]) {
+      console.log('[DeleteModel] Model not found in config')
+      ElMessage.error(i18n.t('models.deleteFailed'))
+      return
+    }
+
+    delete providerConfig.models[model.id]
+    console.log('[DeleteModel] Models after delete:', providerConfig.models)
+
+    if (Object.keys(providerConfig.models).length === 0) {
+      delete (currentConfig.provider as Record<string, unknown>)[model.providerId]
+      console.log('[DeleteModel] Provider deleted (no models left)')
+    }
+
+    console.log('[DeleteModel] Final config to update:', JSON.stringify(currentConfig, null, 2))
+    await updateGlobalConfig(currentConfig)
+    ElMessage.success(i18n.t('models.deleteSuccess'))
+    modelStore.fetchModels()
+  } catch (error) {
+    if (error !== 'cancel') {
+      console.error('Failed to delete model:', error)
+      ElMessage.error(i18n.t('models.deleteFailed'))
+    }
+  }
 }
 
 const formatContextLimit = (limit: number): string => {
@@ -121,7 +191,11 @@ const formatContextLimit = (limit: number): string => {
 }
 
 .model-item:hover {
-  background-color: var(--bg-100) !important;
+	background-color: var(--bg-100) !important;
+}
+
+.model-item:hover button {
+	opacity: 1 !important;
 }
 
 /* 自定义滚动条样式 */
