@@ -42,17 +42,15 @@ export const useMessageStore = defineStore('message', () => {
     } else {
       const part = message.parts[partIndex] as any
       if (part.type !== type) {
-        if (part.type === 'text' && (type === 'reasoning' || type === 'thought' || type === 'thinking')) {
-          console.log(`[STORE-TYPE] Part ${partID} 升级为推理类型: ${type}`)
-          part.type = 'reasoning'
-          message.parts[partIndex] = { ...part }
-        } else if (type === 'text' && part.type === 'reasoning') {
-          console.warn(`[STORE-TYPE] 拒绝将推理 Part ${partID} 降级为 text`)
-        } else {
-          part.type = type
-          message.parts[partIndex] = { ...part }
-        }
+      if (part.type === 'text' && (type === 'reasoning' || type === 'thought' || type === 'thinking')) {
+        part.type = 'reasoning'
+        message.parts[partIndex] = { ...part }
+      } else if (type === 'text' && part.type === 'reasoning') {
+      } else {
+        part.type = type
+        message.parts[partIndex] = { ...part }
       }
+    }
     }
 
     message.parts = [...message.parts]

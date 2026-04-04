@@ -35,10 +35,7 @@ export async function getGlobalConfig(): Promise<Config> {
  * 更新全局配置
  */
 export async function updateGlobalConfig(config: Partial<Config>): Promise<Config> {
-  console.log('[updateGlobalConfig] directory:', GLOBAL_CONFIG_DIR)
-  console.log('[updateGlobalConfig] config:', JSON.stringify(config, null, 2))
   const result = await patch<Config>('/config', { directory: GLOBAL_CONFIG_DIR }, config)
-  console.log('[updateGlobalConfig] result:', JSON.stringify(result, null, 2))
   return result
 }
 

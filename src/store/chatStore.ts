@@ -49,27 +49,23 @@ export const useChatStore = defineStore('chat', () => {
 
   // 获取 Session 列表并尝试恢复当前 Session
   const fetchSessions = async () => {
-    listLoading.value = true
-    try {
-      console.log('[ChatStore] Fetching sessions for workspace:', serverStore.workspace)
-      const sessions = await getSessions({
-        directory: serverStore.workspace,
-        limit: 50 // 增加限制，确保能看到
-      })
-      console.log('[ChatStore] Sessions received:', sessions)
-      sessionList.value = sessions
+  listLoading.value = true
+  try {
+    const sessions = await getSessions({
+      directory: serverStore.workspace,
+      limit: 50
+    })
+    sessionList.value = sessions
 
-      // 自动恢复逻辑：从 LocalStorage 读取
-      const savedSessionId = localStorage.getItem('g2_current_session_id')
-      if (!currentSession.value && savedSessionId) {
-        const found = sessions.find(s => s.id === savedSessionId)
-        if (found) {
-          console.log('[ChatStore] Auto-restoring session:', savedSessionId)
-          selectSession(found)
-        }
+    const savedSessionId = localStorage.getItem('g2_current_session_id')
+    if (!currentSession.value && savedSessionId) {
+      const found = sessions.find(s => s.id === savedSessionId)
+      if (found) {
+        selectSession(found)
       }
+    }
 
-      return sessions
+    return sessions
     } catch (error) {
       console.error('[ChatStore] Failed to fetch sessions:', error)
     } finally {
@@ -172,9 +168,8 @@ export const useChatStore = defineStore('chat', () => {
         currentSession.value.title === i18n.t('sidebar.newChat') ||
         currentSession.value.title === currentSession.value.id
 
-	if (isDefaultTitle) {
-		console.log('[ChatStore] Triggering AI summary for title...')
-		summarizeSession(currentSession.value.id, {
+    if (isDefaultTitle) {
+    summarizeSession(currentSession.value.id, {
 			providerID: modelStore.selectedModel.providerId,
 			modelID: modelStore.selectedModel.id,
 			auto: true

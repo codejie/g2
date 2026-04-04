@@ -40,12 +40,10 @@ export const useEventStore = defineStore('event', () => {
         }
       },
       onSessionStatus: (payload) => {
-        console.log('[SSE] Session Status:', payload)
-        // 消息完成时触发文件树刷新 (idle 表示工作完成)
-        if (payload.status && typeof payload.status === 'object' && payload.status.type === 'idle') {
-          serverStore.triggerFileTreeRefresh()
-        }
-      },
+      if (payload.status && typeof payload.status === 'object' && payload.status.type === 'idle') {
+        serverStore.triggerFileTreeRefresh()
+      }
+    },
       onServerHeartbeat: () => {
         lastHeartbeatTime.value = Date.now()
         isServerActive.value = true
@@ -53,11 +51,10 @@ export const useEventStore = defineStore('event', () => {
       onError: (error) => {
         console.error('[SSE] Error:', error)
       },
-      onReconnected: (reason) => {
-        console.log('[SSE] Reconnected:', reason)
-        lastHeartbeatTime.value = Date.now()
-        isServerActive.value = true
-      }
+      onReconnected: () => {
+      lastHeartbeatTime.value = Date.now()
+      isServerActive.value = true
+    }
     }
 
     const unsubscribe = subscribeToEvents(callbacks)

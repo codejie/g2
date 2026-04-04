@@ -188,7 +188,6 @@ function connectViaBrowser() {
 }
 
 function broadcastEvent(globalEvent: GlobalEvent) {
-  console.log(`[SSE-INCOMING] Type: ${globalEvent.payload.type}`, globalEvent.payload.properties)
   const { type, properties } = globalEvent.payload
   allSubscribers.forEach(callbacks => {
     handleEventForSubscriber(type, properties, callbacks)

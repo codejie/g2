@@ -44,8 +44,10 @@ export async function getActiveModels(directory?: string): Promise<ModelInfo[]> 
     directory: directory ? formatPathForApi(directory) : GLOBAL_CONFIG_DIR,
   })
   const models: ModelInfo[] = []
+  const ignoreOpenCodeZen = import.meta.env.VITE_MODEL_IGNORE === 'true'
 
   for (const provider of data.providers) {
+    if (ignoreOpenCodeZen && provider.name === 'OpenCode Zen') continue
     for (const [, model] of Object.entries(provider.models)) {
       if (model.status === 'active') {
         const variants = model.variants ? Object.keys(model.variants) : []
@@ -69,7 +71,6 @@ export async function getActiveModels(directory?: string): Promise<ModelInfo[]> 
       }
     }
   }
-
   return models
 }
 

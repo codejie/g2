@@ -24,11 +24,10 @@ export const useServerStore = defineStore('server', () => {
 
   // 触发文件树刷新
   const triggerFileTreeRefresh = () => {
-    if (isAutoRefreshFileTree()) {
-      fileTreeRefreshKey.value++
-      console.log('[ServerStore] Triggered file tree refresh, key:', fileTreeRefreshKey.value)
-    }
+  if (isAutoRefreshFileTree()) {
+    fileTreeRefreshKey.value++
   }
+}
 
   watch(baseUrl, (newUrl) => {
     localStorage.setItem('opencode_base_url', newUrl)
@@ -49,26 +48,19 @@ export const useServerStore = defineStore('server', () => {
   }
 
   const setWorkspace = async (_path: string) => {
-    // 忽略传入的 path，始终使用配置中的值
-    // workspace 不可修改
-    console.log('[ServerStore] Workspace is fixed to:', CONFIG_WORKSPACE)
-  }
+}
 
   const initializePaths = async () => {
-    try {
-      const { updateConfig, getPath } = await import('../api/client')
+  try {
+    const { updateConfig, getPath } = await import('../api/client')
 
-      // 通知服务器当前工作区配置
-      await updateConfig({}, CONFIG_WORKSPACE)
-      console.log('[ServerStore] Informed server about workspace:', CONFIG_WORKSPACE)
+    await updateConfig({}, CONFIG_WORKSPACE)
 
-      // 获取服务器确认后的路径信息
-      const pathInfo = await getPath(CONFIG_WORKSPACE)
-      console.log('[ServerStore] Path info:', pathInfo)
-    } catch (err) {
-      console.error('[ServerStore] Failed to initialize paths:', err)
-    }
+    await getPath(CONFIG_WORKSPACE)
+  } catch (err) {
+    console.error('[ServerStore] Failed to initialize paths:', err)
   }
+}
 
   return {
     baseUrl,
